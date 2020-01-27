@@ -1,0 +1,15 @@
+Postavljanje projekta
+
+1   na github novi repo (hleb)
+2   u vscode git clone ( gornjeg )
+3   u vs code novi maven spring boot projekt ( ide dalje preko spring boot inicijalzera ) naziv api
+4   u vs code terminalu novi angular projekat ( ide preko angular cli ) naziv webui
+5   izmena pom.xml da se omoguce razliciti nacini builda projekta ( api+webui = jar), ili svaki za sebe
+6   konfigurisanje proxy u angularu da se izbegne cros origin tokom razvoja app
+7   isprobati dali sve radi u svim varijantama ( api + angular = bundle ) i svaki za sebe
+
+dodao prosti hello controler u api i angular app.component.html i .ts da cita sa backenda poruku
+radi razdvojeno back je u targetu  api.0.0.1-SNAPSHOT.jar  , a front ng serve sa proxyjem ( rade na 8080 i 4200)
+radi zajedno back+front je u targetu bundle.0.0.1-SNAPSHOT.jar ( sve radi na 8080 i angular indeh.html i api na 8080)
+
+korak 1 - GOTOVO
