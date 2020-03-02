@@ -1,0 +1,35 @@
+VALIDACIJA 
+----------
+
+Validacija na server strani je OBAVEZNA
+
+o validaciji:
+https://reflectoring.io/bean-validation-with-spring-boot/
+https://dimitr.im/validating-the-input-of-your-rest-api-with-spring
+https://www.baeldung.com/spring-mvc-custom-validator
+
+
+
+Klijent strana bi takodje trebala da odradi validaciju , ali u to se nemoze pouzdati.
+
+Postoje 3 stvari koje mogu stici u http requestu koje se mogu validirati i to:requestbody,pathvariable i queryparametri
+
+Za auth kontroler klijent salje SignUpReqDto ili SignInReqDto u requestbody (sa klijenta stize json koji se automatski mapira u odgovarajuci dto model). Validacija se poziva stavljanjem @Valid anotacije ispred odgovarajuceg requestbodija.
+
+Ostala dva slucaja ovde nemamo , ali su pathvariable i queryparametri jednostavniji jer su primitiv tipovi (integeri ili String). Kontroleri koji imaju ovaj tip validacije istu pozivaju anotacijom @Validate koja ide na ceo kontroler, a sama validacija se postize stavljanjem zeljene anotacije ispred pathvariable ili queryparametra - bice objasnjeno kad zatreba
+
+ova dva tipa validacija bacaju dva razlicita tipa exceptiona pa na to obratiti paznju u exception handleru
+ukoliko validaciju sledi bindingresult onda su rezultati validacije u njemu tj. ne baca exception. Ja sam to koristio
+
+
+kad nismo zadovoljni ugradjenim validacijama mozemo praviti custom validacije i koristiti ih kao i ugradjene
+prave se tako sto se naprave dve klase anotacija i validator 
+
+kod validacije signup je korisceno skoro sve gore napisano od jednostavnih ugradjenih do maksimalno komplikovane validacije ( objasnjenja su u samim fajlovima)
+
+ako neki field ili cela klasa ima puno validacija moze se napraviti jedna koja ih sve obuhvata - nisam koristio
+takodje se mogu praviti validacione grupe pa da se validacija sprovodi samo kad je ta grupa prozvana - nisam koristio
+
+Usko vezano sa validacijama je i upravljanje greskama - exception - o tome u posebnom dodatku.
+
+

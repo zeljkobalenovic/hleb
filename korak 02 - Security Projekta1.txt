@@ -1,0 +1,43 @@
+Starting point :
+korak 1 - GOTOVO
+dodao prosti hello controler u api i angular app.component.html i .ts da cita sa backenda poruku - OBRISANO
+
+Security Projekta
+
+1   HelloControler sa vise hello endpointa za testiranje (home mogu svi, admin moze sve, a ostalo koja rola taj hello dopusten)
+
+2   Model enum rolename + permission i dva entiteta ( useri i role - sve sa mapiranjima za pravljenje tabela)   
+
+3   Repository dva dodata interfejsa za usere i role
+
+4   config - pocetno konfigurisanje auth svima dozvoljeno (za signup i signin) ostalo sve mora da prodje autentikaciju i autorizaciju ( rola da dozvoljava nesto)
+
+5   dto dva modela za signup i signin
+
+6   controller dodat auth kontroler sa dva endpointa za signup i signin
+
+7   service dodat auth service za biznis logiku dva endpointa u auth kontroleru 
+
+VAZAN PRINCIP
+
+Podela odgovornosti je sledeca ( za auth/signup koji prvo radim, ali vazi uvek )
+
+1   klijent salje http request
+2   kontroler prvo proverava klijentov requst ( VALIDACIJA !!! - na serverskoj strani je OBAVEZNA)
+    opsirnije o validaciji u dodatak 01 - Validacija.txt
+    i usko povezano sa validacijom ExceptionHandling u dodatku - dodatak02 - Exceptions.txt
+    VAZNO - ovde sam se dosta zadrzao , ali za svaki restAPI validacija i exceptionhandling su OBAVEZNI
+    ukoliko prodje validaciju metoda kontrolera poziva odgovarajucu servisnu metodu (gde je biznis logika)
+
+VAZNO / Springsecurity podrzava vise vrsta autentikacije i vise nacina autorizacije sve je to u :
+https://github.com/zeljkobalenovic/springsecurity.git - moja objasnjenja + 3 kursa (security je VAZAN - zato opsirno nauciti)
+https://www.youtube.com/playlist?list=PLqq-6Pq4lTTYTEooakHchTGglSvkZAjnE
+https://www.youtube.com/watch?v=her_7pa0vrg
+https://www.youtube.com/playlist?list=PLVApX3evDwJ1d0lKKHssPQvzv2Ao3e__Q    
+
+Nacin na koji sam koristio spring security u ovom projektu je u dodatak 03 - BackendJwtSecurity + dodatak 04 - frontendJwtSecurity
+
+
+Ovo je kraj backend dela - ide commit
+Zatim ide frontend security i tek onda je kraj securityja tj. zavrsetak koraka 02
+

@@ -1,0 +1,40 @@
+Backend JWT security
+====================
+
+Odnosi se na Spring boot security - backend security za restAPI
+
+Posto je security jako bitan moj projekat ce koristiti sto vise mogucnosti koje spring security nudi 
+zamisao je da imam : customers , products i orders ( sa orderdetails)
+
+Korisnike app cu podeliti u nekoliko grupa (rola) sa razlicitim dozvolama (permission) sta ko sme da radi i to  :
+ADMIN sme sve
+MANAGER i GENERALMANAGER ( rad sa customer i product - read/write) , izvestaji/grafikoni samo GENERALMANAGER + orderi samo read
+EMPLOYEE i USER ( rad sa orderima - read/write) , a za product i customer samo read
+razlika bi bila u tome da se u buducnosti user veze za customera pa da ima pravo samo svoje ordere da gleda , a ne sve
+Koristicu i permissione nad order,product,customer...
+
+1   model ( ukupno 5 fajlova)
+Ovakva se organizacija radi sa tri tabele ( entity ) user , role , permission ( + dodatne 2 u mysql posto je user - role many to many
+i role - permission takodje many to many ) , jasnije je kad se pogleda baza ili sami model fajlovi
+
+Uobicajeno je da se role i permissioni organizuje kao enumi ( ograniceni skupovi dozvoljenih vrednosti ) zato dva enum fajla
+
+2   dto ( ukupno 2 fajla )
+Uobicajeni dto objekti za signin i signup
+
+3   validator i exception ( vazi za celu aplikaciju ne samo za security)
+dadato sta treba za security , ali bice dalje jos
+
+4a   service - securityservice ( 2 fajla implementacije userdetails i userdetailsservice ) 
+ovo je sve objasnjeno u fajlovima
+
+4b   service - jwt service ( 3 fajla potrebna za ovu vrstu security)   
+doda se prvo u pom biblioteka za rad sa jwt , zatim jwt properties ( final varijable potrebne za rad jwt utila),
+zatim jwtutil ( gomila metoda za pravljenje i citanje jwt tokena) i na kraju jwtfilter (za autentikaciju i autorizaciju)
+sve je objasnjeno u fajlovima
+
+5   config - security configuration 
+sve objasnjeno u njemu
+
+
+

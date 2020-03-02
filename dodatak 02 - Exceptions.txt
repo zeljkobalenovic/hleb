@@ -1,0 +1,34 @@
+EXCEPTION HANDLING - upravljanje greskama  
+-----------------------------------------
+
+ExceptionHandling na server u restAPI je OBAVEZAN
+
+O Exception Handlingu: 
+
+http://www.appsdeveloperblog.com/restful-web-services-with-spring-framework-video-tutorials/ ( 5 videa o exception handlingu)
+https://www.toptal.com/java/spring-boot-rest-api-error-handling
+
+U Spring boot imamo ugradjeni exception handling , ali cu ja za moj api napraviti svoj 
+Kod exception handlinga bi trebala da se koristi internacionalizacija ( poruke na raznim jezicima ) ali cu bez toga zbog jednostavnosti.
+
+Default spring boot bean za greske je ( timestamp , status, error, message, path ). Cilj mog exception handlinga je da hvatam sve greske u programu - prosledim ih na obradu odgovarajucem metodu i klijentu prikazem odgovarajucu poruku. Da bi se to odradilo koraci su sledeci :
+
+1       Definisem moj bean greske koji cu slati klijentu u slucaju bilo koje greske u app
+2       Definisem centralno mesto za exception handling gde ce biti metode koje hendlaju greske
+3       Ukoliko imam neke custom greske koje nisu javine dodam njih i takodje ih hendlujem
+
+Sve u vezi ExceptionHandlinga nalazi se u folderu exception i to :
+
+1   ApiError.java   je model kako ce izgledati ono sto vracam klijentu kao error respons - objasnjenja u fajlu
+2   RestExceptionHandler.java - centralna klasa za sve greske - sva objasnjenja u samom fajlu
++   proizvoljan broj customexceptiona ( treba da extenduju runtime exception)
+
+VAZNO - ApiError je prakticno bean za greske kojim menjamo default spring bootov
+
+VAZNO - U RestExceptionHandleru moze biti proizvoljan broj exceptionhandlera sa metodama za njihovo hendlanje
+
+        Ako imamo opstiju i specificniju gresku ( exception i nullpointerexception) obe definisane spring boot je
+        dovoljno pametan da hendla specificniju , a samo ako nema hendlinga onda opstu - bas ovaj primer
+
+VAZNO - Ako postoji vise hendlera koji svi koriste isto hendlovanje moze se napisati grupni hendler - ima primer
+
