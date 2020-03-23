@@ -1,0 +1,111 @@
+Angular Reactive Form
+=====================
+
+Angular koristi Template-driven i Reactive Forms
+Za velike projekte i komplikovane forme uglavnom se korist Reactive Forms (zato sto je zavisnost html i ts jako mala), pa obicno 
+jedni dizajniraju (html+css), a drugi programiraju. Koristicu Reactive Forms za moju formu registracije . 
+
+VAZNO - Reactive Form ( koraci i objasnjenja)
+
+KORAK 1 : definisu se varijable i to :
+            za samu formu (forma, kontrole) - 1 formgroup (za samu formu),5 formcontrol(za polja),1 formarray (za niz rola)
+    KORAK 1A : varijabla koja cuva vrednosti(value) i natpise za html (description)     
+               na server se salje set<String> pa pravim pripremu tj. dozvoljene stringove za slanje
+    KORAK 1B : ostale potrebne varijable
+
+KORAK 2 : u konstruktor dodamo sta treba (obicno servis - account ovde , i form builder za lakse pravljenje forme)
+
+KORAK 2A : napravi se zeljeni html izgled - u odnosu na obican html dodaje se ( to je sablon )
+            <form  [formGroup]="registerForm" (ngSubmit)="onSubmit()"> povezuje sa varijablom i dodaje submit event
+            <input formControlName="cpassword" > povezuje sa varijablon u ts (tako za svih 5)
+            
+            u petlji *ngFor pravi i inicijalizuje cekboxove za formarray
+            VAZNO : ovde se za inicijalizaciju koristi vec hardcodovan array , u opstem slucaju bi varijabla bila
+            prazan array , a inicijalizacija bi se vrsila u ngOnInit metodi tj. alowedroles smo mogli dobiti
+            upitom sa servera - u ngoninit metodi pozove se servisna metoda koja getuje dozvoljene role
+            <input type="checkbox" [value]="data.value" (change)="onCheckboxChange($event)" /> {{data.description}}
+           
+            <button[disabled]="registerForm.invalid"> disejbluje dugme dok forma neprodje validaciju
+
+            + se dodaju i validacione poruke ( za klijent side validaciju)
+            + se doda alertbox za poruke greske sa servera (ako pukne validacija na serveru npr. username vec postoji i sl.)
+
+KORAK 3 :  VAZNO - validacije - klijent side validacije opsirno - kakve postoje i kako se prave
+
+           postoje ugrdjene ( kao u login - required,minlength,email, patern ....) , a ako nemamo pravimo custom validator 
+           VAZNO - pravljenje custom validatora - pravi se funkcija za validaciju
+           JEDNOSTAVAN - BEZ PARAMETARA 
+
+           function imeValidatora(control:AbstractControl) : { [key:string] : boolean } | null {
+               // control moze biti bilo kakva kontrola (FormGroup, FormControl, FormArray)
+               logika -  validatora to pisemo
+               return // vraca null , ako je sve ok , ili parvrednosti string(naziverrora):true(uvek)
+           }
+           SLOZEN - SA PARAMETRIMA (npr kontrola je broj godina , a mi hocemo da vidimo dali je broj izmedju dve vrednosti)
+                    onda vrednosti idu kao parametrima
+                    ili uporedjujemo dva polja (password i cpassword) onda je cpassword - control (on se validira) , a password je
+                    parametar (sa njim se uporedjuje)
+                    ili je cela forma control , a dva polja koja uporedjujemo su parametri (password i cpassword), ali onda validator
+                    ide na FormGroup , a ne na pojedinacnu kontrolu , ali rezultat validacije mozemo u html pokazati gde hocemo
+                    ili da li email pripada nekom domenu ( *****@hleb.rs) tada je email control , a hleb.rs je parametar
+                    
+           function imeValidatora(params:any) : ValidatorFn {
+               return(control:AbstractControl) : { [key:strin g] : boolean} | null => {
+                   logika validacije
+                   return null;
+               };
+            }
+
+            Koriscenje u oba slucaja je isto - u konstruktor kontrole koju validiramo dodamo i nas validator npr. 
+
+            email : new FormControl('',[Validators.required , imeValidatora]) - ako je bez parametara
+            email : new FormControl('',[Validators.required , imeValidatora(parametar1,parametar2,...)]) - ako je sa parametrima
+
+            Opsirnije o validacijama u :
+
+            https://jasonwatmore.com/post/2018/11/07/angular-7-reactive-forms-validation-example
+            https://dzone.com/articles/how-to-create-custom-validators-in-angular
+
+                        
+KORAK 4 : ngOnInit metoda inicijalizuje formu - ovo je sablon prave se formkontrole i formarray i na kraju formgroup i povezuju
+          varijable po korak 1 sa poljima na html, a zatim  
+          Kad sam napravio custom validaciju ( kontrolise password i cpassword , kao i email i cemail) , dodajem je u form group
+          sa this.imeformgroupa.setValidators([prvivalidator, drugivalidator ...]) to je kraj inicijalizacije    
+
+KORAK 5 : Vracam se u html i dodajem sve validacije u prethodnom koraku na html ( da se greske prikazuju ) na primer :
+        <div *ngIf="cemail.touched && cemail.errors" class="errorMessage">
+            <div *ngIf="cemail.errors.required">Confirm Email is required</div>
+            <div *ngIf="cemail.errors.mustMatch">Email must match</div>
+        </div>  
+
+        VAZNO - prvo proveravam control.touched i control.errors ( sablon je da se greska ne ispisuje uvek , tj. odmah po otvaranju
+                forme zato prvo proveravam da li je kontrola dirana - ovo je true samo ako neko udje pa izadje iz kontrole) , naravno
+                u and delu je dali uopste ima gresaka na toj kontroli
+                U svrhu prikaza poruka validacije mogu se koristiti i drugi eventi na kontrolama, tj. celoj formi 
+                (touched, dirty, pristine na kontroli ili celoj formi) ili submited (za celu formu)
+
+KORAK 6 : OPCIONO - kod mene reaguje na cekiranje i odcekiranje zeljenih rola i na osnovu akcije puni niz roles (vidi u kodu ts)
+
+KORAK 7 : OPCIONO - kod signin sam za poruke sa servera ( o gresci ) koristio alertbox (malo doteran kao bootstrap 4)
+                    posto ce ovde poruke sa servera biti komplikovanije , a i vezbe radi poruke u signup cu da prikazujem
+                    kao modal ( iskoce i cekaju da se nesto pritisne) . Poruku hocu da prikazem u oba slucaja ( i kad je rezultat
+                    ok - onda stize json novo registrovanog usera , ili ako je neki error onda stize greska sa servera koju
+                    takodje hocu opsirno da prikazem - kako one koje su samo serverske - npr. username ili email vec postoji , tako
+                    i one o validaciji - u tu svrhu cu probno iskljucivati klijentsku validaciju , da bi video greske serverske validacije)
+
+            Modal poruke postoje u bootstrap 4 , koji dosad koristim , ali cu sada upotrebiti novu biblioteku (na internetu postoji mnogo)
+            po imenu ngx-bootstrap ( tj. bootstrap prilagodjen angularu , ta biblioteka takodje zahteva bootstrap , sto je ispunjeno)
+            Instalacija je klasicna , a upotreba je slicna upotrebi bootsrapa ( zanimljuva je i biblioteka angular material)
+            Sve ove third party biblioteke olaksavaju razvoj tako sto upotrebljavam gotove predloske umesto da sam sve pisem , a i lepse je
+            jer su ih razvijali profesionalci , postoje mnogi predlosci za mnoge ui elemente. Opsirnije u kodu.
+            7/1 instalacija sa sajta : npm install ngx-bootstrap -- save  ( ovako slicno sve 3 party biblioteke )
+                ovo dodaje najnoviju verziju biblioteke u package.json
+            7/2 u app.module.ts dodati sta treba za koriscenje modala ( vidi u fajlu )
+            7/3 u komponenti koja ce koristiti modal dodati sta treba ( vidi u fajlu )
+
+
+ 
+
+
+
+

@@ -1,0 +1,123 @@
+
+<div class="container">
+    
+    <form  [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        
+        <div class="form-group">
+        <label for="username">User Name</label>
+        <input type="text" formControlName="username" class="form-control" id="username" placeholder="Enter your username ...">
+        <div *ngIf="username.touched && username.errors" class="errorMessage">
+          <span *ngIf="username.hasError('required')">User name is required</span>
+          <span *ngIf="username.hasError('minlength')">User name min lenght is 6</span>
+          <span *ngIf="username.hasError('maxlength')">User name max lenght is 50</span>
+        </div>     
+        </div>
+       
+        <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" formControlName="password" class="form-control" id="password" placeholder="Enter your password ...">
+        <div *ngIf="password.touched && password.errors" class="errorMessage">
+          <span *ngIf="password.hasError('required')">Password is required</span>
+          <span *ngIf="password.hasError('minlength')">Password min lenght is 6</span>
+          <span *ngIf="password.hasError('maxlength')">Password max lenght is 50</span>
+        </div>
+        </div>  
+        
+        <div class="form-group">
+        <label for="cpassword">Confirm Password</label>
+        <input type="password" formControlName="cpassword" class="form-control" id="cpassword" placeholder="Confirm your password ...">
+        <div *ngIf="cpassword.touched && cpassword.errors" class="errorMessage">
+            <div *ngIf="cpassword.errors.required">Confirm Password is required</div>
+            <div *ngIf="cpassword.errors.mustMatch">Passwords must match</div>
+        </div>
+        </div>
+ 
+        <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" formControlName="email" class="form-control" id="email" placeholder="Enter your email ...">
+        <div *ngIf="email.touched && email.errors" class="errorMessage">
+          <span *ngIf="email.hasError('required')">Email is required</span>
+          <span *ngIf="email.hasError('email')">Email not a valid email address</span>
+        </div> 
+        </div>
+
+        <div class="form-group">
+        <label for="cemail">Confirm Email</label>
+        <input type="email" formControlName="cemail" class="form-control" id="cemail" placeholder="Confirm your email ...">
+        <div *ngIf="cemail.touched && cemail.errors" class="errorMessage">
+            <div *ngIf="cemail.errors.required">Confirm Email is required</div>
+            <div *ngIf="cemail.errors.mustMatch">Email must match</div>
+        </div>
+        </div>
+      
+        <div *ngFor="let data of alowedroles; let i=index">
+            <label>
+              <input type="checkbox" [value]="data.value" (change)="onCheckboxChange($event)" />
+              {{data.description}}
+            </label>
+        </div>
+        
+       
+      <button type="submit" class="btn btn-primary" [disabled]="registerForm.invalid">Sign up</button>  
+    </form>
+
+    <!-- umesto proste alert poruke kao u signin 
+    
+      <div class="alert alert-warning alert-dismissible fade show" role="alert" *ngIf="invalidRegister">
+        <strong>Error !</strong> {{errorMessage}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      -->
+</div>
+
+<!-- KORAK 7/4 modal template - pravimo ga kako hocemo - klasican html manje ili vise komplikovan - u kodu ts se referencira 
+     preko #template (naziv je proizvoljan - prva linija ng-template se kod mene poziva sa #template u kodu -->
+
+<!-- modal html , sa ngx sajta - najjednostavniji basic modal dijalog -->
+<!--
+<button type="button" class="btn btn
+-primary" (click)="openModal(template)">Create template modal</button>
+ -->
+<ng-template #template>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Modal message</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <!-- Prvo prikazem registerMessage-->
+    <h2>{{registerMessage}}</h2>
+    <!-- U zavisnosti od invalidRegister prikazujem registrovanog usera ili gresku sa servera -->
+    <div *ngIf="!invalidRegister ; then userinfo else errorinfo">ovo se ne prikazuje</div>
+      <!-- ako nema greske - user info -->
+      <ng-template #userinfo>
+        <h5>User info :</h5>
+        <h6>User id : <strong>{{modalid}}</strong></h6>
+        <h6>User name : <strong>{{modalusername}}</strong></h6>
+        <h6>User email : <strong>{{modalemail}}</strong></h6>
+        <h6>User status : <strong>{{modalactive}}</strong></h6>
+        <h6>User roles :</h6>
+        <ul *ngFor="let item of modalroles">
+          <li>
+            <h6><strong>{{item}}</strong></h6>
+          </li>
+        </ul> 
+      <!-- ako ima greske - error info -->   
+      </ng-template>
+      <ng-template #errorinfo>
+        <h5>Error info :</h5>
+        <h6>Message : <strong>{{modalerror}}</strong></h6>
+        <ul *ngFor="let item of modalerrorlist">
+          <li>
+            <h6><strong>{{item}}</strong></h6>
+          </li>
+        </ul> 
+      </ng-template>
+    
+  </div>
+</ng-template>
+
+

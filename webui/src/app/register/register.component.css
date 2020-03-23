@@ -1,0 +1,9 @@
+
+.container {
+    max-width: 500px;
+    
+}
+
+.errorMessage {
+    color:red;
+}

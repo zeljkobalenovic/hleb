@@ -18,8 +18,8 @@ import lombok.Data;
 @Data
 // maksimalno komplikovana custom validacija za vezbu
 @FieldsMatch.List({
-    @FieldsMatch(field = "email" , fieldMatch = "confirmEmail" , message = "Email addresses do not match!"),
-    @FieldsMatch(field = "password" , fieldMatch = "confirmPassword" , message = "Passwords do not match!")
+    @FieldsMatch(field = "email" , fieldMatch = "cemail" , message = "Email addresses do not match!"),
+    @FieldsMatch(field = "password" , fieldMatch = "cpassword" , message = "Passwords do not match!")
 })
 public class SignUpReqDto {
     @NotBlank
@@ -34,7 +34,7 @@ public class SignUpReqDto {
     @NotBlank
     @Size(min = 6,max = 50)
     @Email
-    private String confirmEmail;
+    private String cemail;
     
     @NotBlank
     @Size(min = 6,max = 50)
@@ -42,7 +42,7 @@ public class SignUpReqDto {
       
     @NotBlank
     @Size(min = 6,max = 50)
-    private String confirmPassword;
+    private String cpassword;
     
     
     // jednostavna custom validacija

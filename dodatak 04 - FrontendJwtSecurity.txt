@@ -1,0 +1,15 @@
+Frontend JWT security
+====================
+
+Frontend korak1 - dodao sam bootstrap ( za koriscenje da ne moram sam sve dizajnirati ) + jquery + popper.js = idu zajedno sa bootstrap
+npm install bootstrap/jquery/popper.js --save ( bez -g jer hocu samo u ovaj projekat da ih dodam )
+
+Ta 3 su sada u package.json ( slicno pom.xml na backendu ) , plus su u node_modules
+Zatim dodajem u angular.json u stilove i skriptove ( vazan je redosled kod skriptova jer zavise jedni od drugihn)
+
+Sada kopiram npr. navbar sa bootstrap sajta i probam dali radi ok ( navbar koristi i ostala dva pa je dobar za kontrolu)
+Tako se inace instalisu i bilo kakve potrebne biblioteke (preko npm )
+
+VAZNO - Mislim da je bolja varijanta da ukljucim odgovarajuce CDN dirkt u index.html onda nema nikakvih problema
+sa verzijama i sl. - uvek je najnovija + odmah je i ukljuceno stilovi rade , ali moze i ovako 
+

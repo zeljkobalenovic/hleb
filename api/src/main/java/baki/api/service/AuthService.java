@@ -17,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import baki.api.dto.SignInReqDto;
+import baki.api.dto.SignInResDto;
 import baki.api.dto.SignUpReqDto;
 import baki.api.exception.ApiError;
 import baki.api.model.Role;
@@ -180,7 +181,8 @@ public class AuthService {
 				.signWith(Keys.hmacShaKeyFor(JwtProperties.SECRET.getBytes()))
 				.compact();
 			
-				return new ResponseEntity<>(jwt, HttpStatus.ACCEPTED);
+				SignInResDto response = new SignInResDto(jwt);
+				return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
 
 		} catch (BadCredentialsException e) {
 			ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, "Bad credentials : User and/or password not valid", e);

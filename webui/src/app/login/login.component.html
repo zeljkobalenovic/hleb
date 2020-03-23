@@ -1,0 +1,47 @@
+
+<div class="container">
+    <!-- 
+        klasican bootstrap html - za Angular dodato
+        1) atribut [formGroup] kad hocemo u ts fajlu da se pozovemo
+        na nesto iz ove forme koristimo dato ime atributa i trazimo value ( u ts fajlu insertForm.value )
+        2) ng event submita forme kad se desi povezujemo sa metodom koja ce se izvrsiti
+    -->
+    <form  [formGroup]="insertForm" (ngSubmit)="onSubmit()">
+        <!-- 
+            za angular dodato atribut formControlName preko koga ts kod pristupa polju insertForm.value.Username
+        -->
+        <div class="form-group">
+        <label for="username">User Name</label>
+        <input type="text" formControlName="Username" class="form-control" id="username" placeholder="Enter your username ...">
+            <!-- START    Validacija za svako polje , ako je ima (ja imam po 3 validatora za svako polje) -->
+            <div *ngIf="Username.touched && Username.errors" class="errorMesage">
+                <span *ngIf="Username.hasError('required')">User name is required</span>
+                <span *ngIf="Username.hasError('minlength')">User name min lenght is 6</span>
+                <span *ngIf="Username.hasError('maxlength')">User name max lenght is 50</span>
+            </div>
+            <!-- KRAJ     Validacija za svako polje , ako je ima (ja imam po 3 validatora za svako polje) -->      
+        </div>
+        
+        <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" formControlName="Password" class="form-control" id="password" placeholder="Enter your password ...">
+            <!-- START    Validacija za svako polje , ako je ima (ja imam po 3 validatora za svako polje) -->
+            <div *ngIf="Password.touched && Password.errors" class="errorMesage">
+                <span *ngIf="Password.hasError('required')">Password is required</span>
+                <span *ngIf="Password.hasError('minlength')">Password min lenght is 6</span>
+                <span *ngIf="Password.hasError('maxlength')">Password max lenght is 50</span>
+            </div>
+            <!-- KRAJ     Validacija za svako polje , ako je ima (ja imam po 3 validatora za svako polje) -->  
+        </div>  
+        <!-- VALIDACIJA  dodajemo buttonu atribut disabled koji ce biti true ako je forma invalid tj. ima gresaka-->    
+        <button type="submit" class="btn btn-primary" [disabled]="insertForm.invalid">Sign in</button>
+    </form>
+    <br>
+    <div class="alert alert-warning alert-dismissible fade show" role="alert" *ngIf="invalidLogin">
+        <strong>Error !</strong> {{errorMessage}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+</div>
+

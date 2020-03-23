@@ -1,0 +1,53 @@
+<header>
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom mb-3">
+  
+      <a class="navbar-brand" href="http://localhost:8080/api/home/hello">Hleb Api</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+              aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+        <ul class="navbar-nav flex-grow-2">
+          <li class="nav-item">
+            <a class="nav-link text-dark" [routerLink]='["/home"]'>Home</a>
+          </li>
+          <li class="nav-item" *ngIf="(LoginStatus$ | async) as LoginStatus"> 
+            <a class="nav-link text-dark"  [routerLink]='["/products"]'>Products</a>
+          </li>
+          <li class="nav-item" *ngIf="(LoginStatus$ | async) as LoginStatus">
+            <a class="nav-link text-dark"  [routerLink]='["/customers"]'>Customers</a>
+          </li>          
+          <li class="nav-item" *ngIf="(LoginStatus$ | async) as LoginStatus">
+            <a class="nav-link text-dark"  [routerLink]='["/orders"]'>Orders</a>
+          </li>
+          <li class="nav-item" *ngIf="UserAuthority.includes('REPORT_READ')">
+            <a class="nav-link text-dark" [routerLink]='["/reports"]'>Reports</a>
+          </li>
+          <li class="nav-item" *ngIf="!(LoginStatus$ | async) as LoginStatus">
+            <!-- LOGIN samo ako je login status false - nema logovanog usera -->
+            <a class="nav-link text-dark" [routerLink]='["/login"]'>Login</a>
+          </li>
+          <li class="nav-item" *ngIf="!(LoginStatus$ | async) as LoginStatus">
+            <!-- REGISTER samo ako je login status false - nema logovanog usera -->
+            <a class="nav-link text-dark" [routerLink]='["/register"]'>Register</a>
+          </li>
+          <li class="nav-item" *ngIf="(UserName$ | async) as UserName">
+            <!-- VAZNO - observable promenjive se nemogu direktno koristiti , nego se koristi async pipe 
+            ovaj pipe radi automatski subscribe , unsubscribe, detektije change itd. tj. sve sto treba za koriscenje 
+            observable (behavior subject je takodje observable ). U mom slucaju observable promenjivu UserName$ sa pipe 
+            subscribujem u obicnu promenjivu UserName koja je sada obican string i nju koristim redovno , tako i za ostale
+            observable UserAuthority$ i LoginStatus$ -->
+            <a class="nav-link text-danger">{{UserName}}</a>
+          </li>
+          <li class="nav-item" *ngIf="(LoginStatus$ | async) as LoginStatus">
+            <!-- LOGOUT samo ako je login status true -->
+            <a class="btn btn-primary text-white"  (click)="onLogout()">Logout</a>
+          </li>
+  
+        </ul>
+  
+  
+      </div>
+  
+    </nav>
+  </header>
