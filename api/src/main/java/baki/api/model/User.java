@@ -3,7 +3,7 @@ package baki.api.model;
 import java.util.Set;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
+// import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -11,7 +11,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+
+
 
 import lombok.Data;
 
@@ -21,12 +22,13 @@ import lombok.Data;
 
 @Data
 @Entity
-// VAZNO ! Sve ovo vazi ako se baza pravi iz koda , ako baza vec postoji ovo ne vazi
+/* VAZNO ! Sve ovo vazi ako se baza pravi iz koda , ako baza vec postoji ovo ne vazi
+od KORAK 3 sve ide iz workbencha pa ovako vise netreba
 @Table(name = "users" , uniqueConstraints = {
                         @UniqueConstraint(columnNames = "username" , name = "uniqueUsernameConstraint"),
                         @UniqueConstraint(columnNames = "email" , name = "uniqueEmailConstraint")
-})
-          
+})  */
+ @Table(name = "users")         
  public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,14 +36,20 @@ import lombok.Data;
     private String username;
     private String email;
     private String password;
-    private boolean active;  
+    private boolean active; 
+    
+    @ManyToMany  
+    @JoinTable(name = "users_has_roles" ,
+        joinColumns = @JoinColumn(name="users_id") ,
+        inverseJoinColumns = @JoinColumn(name="roles_id"))
+    private Set<Role> roles;  
+    
+    @ManyToMany  
+    @JoinTable(name = "users_has_customers" ,
+        joinColumns = @JoinColumn(name="users_id") ,
+        inverseJoinColumns = @JoinColumn(name="customers_id"))
+    private Set<Customer> customers;
+    
+    
 
-    // fetchtype EAGER set rola se UVEK ucitava sa user , LAZY set rola se ucitava kad zatreba
-    // VAZNO - Zbog role based autorizacije mora EAGER , sa default tj. LAZY nece da radi
-    // za diskusiju je zasto kod seta permissiona u role isto nemora nego radi sa default LAZY i nebaca exception
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "users_roles" ,
-        joinColumns = @JoinColumn(name="user_id") ,
-        inverseJoinColumns = @JoinColumn(name="role_id"))
-    private Set<Role> roles;    
 }

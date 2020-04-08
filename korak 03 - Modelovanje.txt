@@ -1,0 +1,103 @@
+Starting point :
+KORAK 2 - GOTOVO
+
+Modelovanje BAZE (MySQL) i entiteta-klasa(Spring Boot)
+======================================================
+
+3 osnovna nacina navedena u application.properties
+
+izmodelovao sam celu bazu hleb u workbenchu mysql (sve model i crtez dijagram) sa tabelama koje imam u spring boot (security 5 tabela) kao i sa novim tabelama potrebnim za projekat ( jos 7 tabela ) i malo sam se poigrao sa sva 3 nacina
+
+VAZNO :
+NACIN 1 - sve uraditi u mysql - radi ok - po ocekivanju (za ovo treba u application propertiess) staviti 
+ddl-auto na NONE (idealno ) ili UPDATE (radi kako treba , ali recimo dodaje u user constrainte unique koje sam ja vec izmodelovao u mysql pa se duplira ). Takodje datasource-initialization na always - prvi put , pa posle never 
+NACIN 2 - sve iz spring boot - probano sa ovih 5 tabela i radi u koraku 2 - ali nije pogodno za ceo projekat
+nacin 3 - pomocu schema.sql (ovo super radi samostalno - kad su sve tabele u schema.sql)
+
+Probao sam i mesavinu (schema.sql pravi neke fajlove , pa onda nastavi spring boot , moze ali nije prakticno , tj. nemoze ako postoje relacije izmedju tabela u te dve grupe )
+
+NAJBOLJI NACIN : 
+Bazu modelujem u cistom mysql-workbenchu , zatim sacuvam model sa promenama , pa izvezem sql script modela u schema.sql spring boot i tako u krug dok se nezavrsi razvoj. Bazu uvek inicijalizujem - always ( pustim oba sql - schema i data). Kad sam zadovoljan vratim inicijalizaciju na never i radim u spring boot , do sledeceg kruga 
+VAZNO ddl-auto stalno drzati na none , da nebi pametovao i menjao bazu posle schema.sql ( a moze to da radi )
+
+Kad dodajem nove entitete ili atribute entiteta - obavezno i u scheme.sql da bi bilo upareno (kad se sledeci put pusti inicijalizacija baze). Nije obavezno ali je cistije tako. Ako samo menjam modele (entity i atribute entity) baza se takodje menja ,
+ali schema.sql se ne menja pa pri sledecoj kreaciji baze od nule ide mix - prvo pusti schema.sql pa onda doteruje razlike iz spring jpa sto nije predvidivo . 
+VAZNO - izmene : dodati nove entitete ili atribute entiteta u schem.sql i u spring paralelno 
+
+VAZNO !!! KONTROLU VRSIM TAKO STO PUSTIM INICIJALIZACIJU ( schema.sql i data.sql ) i GLEDAM KONZOLU :
+AKO JE SVE U REDU ( tj. entiteti su u vinklu sa sql tabelama ) NECE BITI DODATNIH SQL STATMENTA U KONZOLI PRI STARTU APP
+
+
+MAPING ( je ono sto su relacije u sql) 
+======================================
+
+Kao i kod sql postoje 3 tipa mapiranja :
+@OneToOne
+@OneToMany @ManyToOne
+@ManyToMany
+
+VAZNO ( posto sam se odlucio da modeli u springu prate schemu u sql uz maping UVEK !!! dodajem i @JoinColumn sa nazivom STVARNE kolone koja povezuje tabele ). 
+Ako ovo ne uradim onda se pravi dodatna ( ili dve dodatne za manytomany ) tabela preko kojih jpa-hibernate pravi relacije.
+ZAKLJUCAK : uz svaki npr @OneToMany OBAVEZNO i @JoinColumn ( u slucaju @ManyToMany obavezno i @JoinColumn i @InverseJoinColumn) sa stvarnim kolonama iz sql u name="imestvarnejoinkolone".
+
+Mapiranje moze biti u oba smera (u oba entiteta postoji gornje) ili jednosmerno (samo u jednom entitetu postoji gornje)
+
+@ManyToMany primeri su user-role i role-permission iz prethodnih koraka ( OBA SLUCAJA JEDNOSMERNO )
+Npr u user sam mapirao role , dok u rolama nisam mapirao user. Zato lako dobijam listu rola koje user ima , ali ne mogu dobiti listu usera koji imaju neku rolu ( za to bi mi trebalo dvosmerno mapiranje ).
+
+@OneToMany + @ManyToOne je najcesca u mojoj aplikaciji ( sto se vidi iz dijagrama za schema.sql pa cu opsirno objasniti korak po korak na primeru customer - customergroup ).  
+VAZNO !!! objasnjenje je kada schema.sql ne bi odradio svoj posao ( ovde voditi racuna da je vec formirana relacija )
+
+VARIJANTA 0     OVO SE NIKAD NEKORISTI
+BEZ MAPIRANJA ( bukvalno prepisemo table u entity sa svim column u odgovarajuce atribute )
+                napravio bi 2 tabele , sa svim kolonama , ali NE BI NAPRAVIO RELACIJU. kad je relacija vec napravljena u sql svejedno nebi mogli koristiti nista osim CISTOG SQL u springu za bilo sta ( kao stari jdbc )
+
+VARIJANTA 1     OVAKO SE KORISTI
+SA MAPIRANJEM ( bukvalno prepisem tabele u entity sa svim column u atribute !!! OSIM forin key u customer entitetu sto bi bila kolona atribut customer_group_id u tabeli entitetu customer, tj. izostave se kolone koje su forin key , u npr. order-orderitem bice dve - jedna iz order , druga iz product) 
+
+VAZNO !!! - Na sva tri nacina u mysql ce se dobiti isto ( razlika je u upotrebljivosti u springu javi )
+
+    Pravljenje relacije izmedju customer i customergroup moze na 3 nacina ( 2 jednosmerna kad asocijacija ide samo u jednom entitetu - customer ili customergroup ) i bidirekt kada asocijacije idu na oba entiteta.
+    VAZNO : CUSTOMER je MANY strana ( mnogo customera pripada jednoj customer group ) 
+            CUSTOMERGROUP je ONE strana ( jedna customergrupa moze sadrzati mnogo kustomera )   
+            OWNER strana je CUSTOMER ( zato sto ona sadrzi forinkey tj. ona ima kolonu preko koje su tabele povezane )    
+Mapiranja u entity za sve 3 varijante :
+1   cesta varijanta ( jednosmerno mapiranje na many strani - u customer entity + u customergroup NISTA )
+    @ManyToOne
+    @JoinColumn(name = "customers_group_id")    - ovo je opciono **
+    private CustomerGroup customerGroup;
+    ** ako ga nema u customer tabeli ce se napraviti kolona sa default imenom i ona ce se koristiti kao forin key 
+    ** ako ga ima ( neophodno ako koristimo postojecu bazu i postojeci forin key ) navedemo ime kolone gde je postojeci forin key i on ce biti koriscen za mapiranje
+
+2   redja varijanta ( jednosmerno mapiranje na one strani - u customergroup entity + u customer NISTA )   
+    @OneToMany
+    @JoinColumn(name = "customers_group_id")    - ovo je opciono **
+    private List<Customer> customers;
+    ** ako ga nema u customer tabeli ce se napraviti kolona sa default imenom + jos jedna tabela gde ce se povezati taj forin key i primarni key u customer group
+    ** ako ga ima koristice postojeci forin key iz customer i povezace ga sa primary key u customergroup i nece praviti dodatnu tabelu 
+
+3   najcesca varijanta ( dvosmerno mapiranje u oba entiteta , sto daje isti sql , ali najvece mogucnosti u spring javi)  
+    
+    U CUSTOMER : 
+    @ManyToOne
+    @JoinColumn(name = "customers_group_id")    - ovo je opciono (vazi ko gore) i sasvim dovoljno za mapiranje 
+    private CustomerGroup customerGroup;
+    U CUSTOMERGROUP :
+    @OneToMany
+    @JoinColumn(mappedBy = “customer”)          - posto je gornje dovoljno ovde samo navedemo da je mapirano u customer entitetu
+    private List<Customer> customers;
+
+    napomena : mapiranje je moglo i u customergroup entity , a da se u customer sa mappedby pozovem na listu customers 
+
+na gore opisan nacin cu izmapirati sve onetomany + manytoone entitete ( product,productgroup,order,orderitem )
+
+MAPIRANJE MANY TO MANY  - koristicu za customer - user povezivanje ( i to dvosmerno sa mapiranjem u user , a u customer mappedby )
+
+jednosmerno bi bilo user-role ( u user sam izmapirao set rola , a u role nista ) - moglo je i obrnuto sto se tice samog sql
+
+manytomany mora preko trece tabele ( tako je i u sql bazama ) , a takodje moze biti jednosmerno kao gore ili dvosmerno kao dole
+( owner strana moze biti bilo koja , a druga se pozove na nju - mapiranje radim u user , a u customer se pozovem )
+VAZNO !!! kod many to many obavezno Set<> , nesme List<> zbog losih performansi 
+
+
+

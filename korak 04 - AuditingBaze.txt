@@ -1,0 +1,5 @@
+Starting point :  
+posle koraka 3 - osnove modelovanja - osim pocetnih 3 klase (5 tabela) izmodelovao sam u bazi ostalo ( mysql workbench)
+zatim od toga napravio schema.sql koji iz springa pravi bazu uvek kad to pozelimo (NOVU !!!). Sad sledi pravljenje klasa
+
+KORAK 4 - AUDITING 
