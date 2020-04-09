@@ -27,6 +27,8 @@ VAZNO - izmene : dodati nove entitete ili atribute entiteta u schem.sql i u spri
 VAZNO !!! KONTROLU VRSIM TAKO STO PUSTIM INICIJALIZACIJU ( schema.sql i data.sql ) i GLEDAM KONZOLU :
 AKO JE SVE U REDU ( tj. entiteti su u vinklu sa sql tabelama ) NECE BITI DODATNIH SQL STATMENTA U KONZOLI PRI STARTU APP
 
+VAZNO !!! Puno je lakse sve praviti u mysqlworkbench nego podesavati sve sa @Table i @Column i @JoinColumn (bukvalno koristim samo name da bi usaglasio javu-camelcase i mysql razdvaja donjom crtom ) Sve ostalo izbegavati u javi tj. koristiti mysql i schema.sql
+
 
 MAPING ( je ono sto su relacije u sql) 
 ======================================

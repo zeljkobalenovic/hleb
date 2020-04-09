@@ -29,7 +29,6 @@ public class Customer {
     private String streetAndNumber;
     private Integer postcode;
     private String city;
-    private String state;
     private Boolean deleted;
 
     @ManyToOne

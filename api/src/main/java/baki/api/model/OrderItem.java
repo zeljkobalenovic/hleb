@@ -18,6 +18,7 @@ public class OrderItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Double quantity;
+    private Double price;
     private Boolean deleted;
     
     @ManyToOne

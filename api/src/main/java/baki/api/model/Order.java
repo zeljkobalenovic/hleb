@@ -3,7 +3,6 @@ package baki.api.model;
 import java.time.LocalDate;
 import java.util.List;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -28,9 +27,6 @@ public class Order {
     
     // od jave8 i jpa 2.2 moze ovako prosto (ima 8 tipova u javi koji idu na 8 tipova u hibernate kad pravi jdbc za sql bazu )
     private LocalDate date;             // hocu samo cist datum bez time dela
-
-    @Column(name = "total_sum")
-    private Double TotalSum;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
