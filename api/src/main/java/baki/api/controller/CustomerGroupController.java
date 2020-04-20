@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import baki.api.model.CustomerGroup;
+import baki.api.repository.CustomerGroupDAO;
 import baki.api.repository.CustomerGroupRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -24,6 +25,17 @@ import lombok.RequiredArgsConstructor;
 public class CustomerGroupController {
 
     private final CustomerGroupRepository customerGroupRepository;
+    
+    // primer koriscenja cistog jpa/hibernate
+
+    private final CustomerGroupDAO cgDAO;
+
+    // find by name cisti jpa/hibernate
+    @PreAuthorize("hasAuthority('CUSTOMER_READ')")
+    @GetMapping("/customergroup2/{name}")
+    public ResponseEntity<?> listByName(@PathVariable String name) {
+        return new ResponseEntity<>(cgDAO.findCustomerGroupByName(name), HttpStatus.OK);
+    }
      
     // create
     @PreAuthorize("hasAuthority('CUSTOMER_WRITE')")    

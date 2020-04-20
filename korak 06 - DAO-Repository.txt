@@ -1,0 +1,36 @@
+Starting point :  
+Izmodelovani entiteti sa relacijama izmedju njih - korak 5.
+
+Stvarni pristup podatcima u sql bazi ostvarujemo kroz DAO (Data Access Object Layer). To je design patern koji odvaja biznis logiku ( service i controller ) od persistence dela ( pisanje i citanje iz baze ). Kad nam u servisu ili kontroleru zatreba nesto iz baze ili zelimo nesto da sacuvamo u bazi mi koristimo metode dao layera da to dobijemo.
+
+Spring boot za to koristi spring data jpa koji gornje ostvaruje upotrebom repository paterna cime pojednostavljuje upotreba jpa/hibernate. Spring data jpa koristi jpa/hibernate ( jpa je specifikacija-interfejs , a hibernate stvarna implementacija-ima i drugih ). Jpa/hibernate se koriste za orm i za pristup bazi preko jdbc.
+
+Spring data jpa koristi jpa/hibernate za :
+entitete i asocijacije izmedju entiteta , entity lifecycle menadzment (entity manager ,stanja, transakcije, pravljenje upita , rad sa entitetima i relacijama ...), query mogucnosti (jpql i/ili native-sql) i na sve to dodaje plus :
+
+Repository design pattern
+=========================
+
+Sve gore navedeno se wrapuje u metode repository, pa ih korisnik samo poziva za rad sa bazom bez da brine o svemu gore navedenom.
+Takodje spring data obezbedjuje no-code implementaciju repository patterna ( dovoljan je samo interfejs ).
+Koriste se sledeci repository ( crud + pagingisorting + jpa = svaki extenduje prethodnog i dodaje nove mogucnosti ). Ja cu koristiti JpaRepository ( svaki moj repository ce njega extendovati , cime ce mi sve metode svih biti dostupne ).
+Spring data jpa takodje obezbedjuje kreiranje queryja iz imena metode repositoryja (naravno uz neka pravila koriscenja naziva), za koje takodje nije potrebno pisati implementaciju. Za komplikovanije slucajeve potrebno je pisati manuelno queryje za metode repositoryja ( bilo jpql ili sql ).
+
+Koriscenjem gornjeg ZNACAJNO se pojednostavljuje oo deo rada sa bazom. 
+
+Znaci za sve entitete pravim repository i svi extenduju jpa ( sve u folderu repository ). Ovo je dovoljno da bez ikakvog dalje rada koristim SVE metode JpaRepository u SVAKOM mom entity repository. Ako zelim vise ( query by methodname ), dovoljno je da samo deklarisem novi metod u zeljenom repository i da ga koristim. Ako treba nesto jos komplikovanije osim metode moram i query manuelno da pisem ( bice napomenuto gde se koristi ). Probacu i jpql i cist sql (negde mora cist sql)
+
+Sve mogucnosti i svi nacini rada opisani su u : https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#repositories
+
+Necu koristiti SVE , ali vecinu stvari hocu , neke cisto zbog probe. Sve ce biti opisano u entity repositorijima. 
+
+U ovom koraku NECU praviti sve potrebne kontrolere i servise za sve moje entitete nego cu se truditi da resim sve ono sto mi treba u zavisnosti od biznis potreba aplikacije. Sve cu isprobavati iz jednog kontrolera , bez servisa i bez raznih validacija koje su neophodne za stvarnu produkciju. Sve to kasnije. Sada samo jedan kontoler i endpointi u njemu za isprobavanje raznih stvari u repository ( kakav sql metode na kraju generisu , dali je sve ok zapisano u bazi i slicne vezbe ).
+
+Primer BEZ spring data jpa => SAMO JPA/HIBERNATE npr. CustomerGroupDAO.java i prva metoda u CustomerGroupController.java.
+Tu je prikazano kako se sa cistim jpa/hibernate moze takodje napraviti layer za pristup bazi.
+
+Mana je da se SVE metode moraju pisati ( spring data jpa ima gomilu gotovih koje NE MORAJU ni navesti jer se nasledjuju iz npr. jparepository , + beskonacnu gomilu metoda iz imena metoda , koje se takodje moraju samo navesti, a ne i pisati njihovu implementaciju). 
+Mana je i komplikovanije pisanje samih metoda ( spring data jpa sve to wrapuje sa anotacijama , pa ne brinemo o persistance contextu, entity managerima itd. , iako ih sve koristi u implementacijama koje mi nevidimo ).
+
+ZAKLJUCAK : OBAVEZNO koristiti SPRING DATA JPA ( REPOSITORY )
+Opsirnije o radu sa spring data jpa ( repository pattern ) u dodatak 08 Repository.txt
