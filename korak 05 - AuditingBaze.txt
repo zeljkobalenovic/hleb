@@ -1,0 +1,65 @@
+Starting point :  
+posle koraka 4 - osnove modelovanja - osim pocetnih 3 klase (5 tabela) izmodelovao sam u bazi ostalo ( mysql workbench)
+zatim od toga napravio schema.sql koji iz springa pravi bazu uvek kad to pozelimo (NOVU !!!). Napravljene sve klase u folderu models. 
+
+Za pravljenje baze OBAVEZNO koristiti schema.sql. I bez toga sam probao i pravi ok bazu , ali bez podesavanja kolona jer sam to izostavio u klasama (sta je nullable ili ne , duzina varchar, unique constrainti, default vrednosti i sl.)
+
+Izvrseno samo osnovno mapiranje relacija (jednosmerne i sve u entitetima u kojima je u sql forin key). Ovo je dovoljno da se poklope schema.sql i pravljenje baze iz springa ( nema dodatnih ddl pri startu i baza je u mysql ista)
+
+Pre detaljne razrade oko mapiranja relacija u jpa-hibernate dodacu auditing.
+
+KORAK 4 - AUDITING
+==================
+
+Auditing baze je obavezan u svakoj ozbiljnoj prici. Obuhvata vise stvari i moze se sprovesti na nivou mysql ( uglavnom trigeri ) ili iz jpa-hibernate sto cu realizovati u ovoj app ( sa maksimalnim koriscenjem automatike ).
+
+IS OR HAS ???   -   NASLEDJIVANJE !!!  - ne postoji u sql , ali u javi VAZAN ( 2 pristupa kod modelovanja entiteta )
+
+VAZNO !!! Auditing se radi za sve tabele(entitete) na isti nacin, pa cu to raditi zajednicki, a ne u svakoj klasi. Za ovakav scenario postoje dva moguca nacina rada ( nasledjivanje i ugradjivanje), tj. zajednicke stvari se mogu izdvojiti u posebnu klasu koju ce onda sve ostale klase-entiteti nasledjivati (nasledjivanje) ili se zajednicke stvari mogu izdvojiti u embedable klasu , pa sa embeded ugradjivati u klase-entitete gde treba. Nema jasnih preporuka sta odabrati pa sam ja odabrao NASLEDJIVANJE (stara java rasprava u vezi oop - nasledjivanje (KLASA JE TO STO NASLEDJUJE UZ DODATNE ATRIBUTE) ili ugradjivanje (KLASA SADARZI TO STO SE EMBEDUJE UZ DODATNE ATRIBUTE).
+
+Step1   kreiranje zajednicke klase (osim cistog auditinga u tu zajednicku klasu stavljam sve sto je isto za sve tabele-entitete)
+        BaseEntity.java  je klasa koju ce nasledjivati svi entiteti (koji idu na web - dostupni korisnicima )   
+        NECE je koristiti samo klase Role.java i Permission.java - neidu na web ( ali mogu i one da se audituju kao i sve druge)
+        NASLEDJIVACE je : Customer,CustomerGroup,Order,OrderItem,Product,ProductGroup i User.
+
+Step2   Zajednicko za sve ove klase je zasada samo id atribut ( primarni kljuc ) - njega selimo u BaseEntity
+        +
+        Dodajemo 4 auditing polja ( ko i kad je kreirao ili promenio zapis). Sva 4 polja se automatski popunjavaju koriscenjem @EntityListeners(AuditingEntityListener.class) anotacije koju obezbedjuje spring data auditing (VAZNO - u cistom jpa ovo mora rucno tj. sami moramo pisati metode - opsirnije https://www.baeldung.com/database-auditing-jpa)
+        VAZNO !!! Nije automatski ukljucen pa ga treba ukljuciti (JpaAuditingConfiguration) + konfigurisati ( ja sam ga konfigurisao da iz springsecurity vadi logovanog usera koji trazi insert i/ili update ). 
+        NAPOMENA : Samo pri registraciji NOVOG KORISNIKA nemamo logovanog usera, ali se podrazumeva da je sam sebe uneo, pa u tom slucaju polja createdby i lastmodifiedby koja spring security oznaci sa anonimni user mozemo smatrati da je to zapravo onaj koji je uneo zapis (samo za insert , pri eventualnom update bice ok)
+        Audit koristi metode @PrePersist i @Preupdate i @PreRemove da popuni polja , a ako jos nesto treba mogu i manuelno da definisem sta te dve metode da rade (nisam koristio jer je automatika ok , ali moze npr. logovanje i sl.).
+        NAPOMENA : Ovaj sistem je manjkav pri brisanju jer sta god @PreRemove uradi biva obrisano zajedno sa zapisom.
+        VAZNO !!! Koristicu soft delete pa mi gornje ogranicenje nije problem (inace je soft delete praksa u ozbiljnim db)
+        +
+        deleted polje (po defaultu je false). Sluzi za soft delete zapisa. Nista se stvarno nebrise iz baze nego se samo oznaci da je obrisano. Ovo zahteva da se pazi pri radu sa bazom na to polje (zapis koji je oznacen kao obrisan u stvari nije i potrebno je voditi racuna o tome pri svakom upitu u bazu ). Tu na scenu stupa opet spring data sa dve anotacije ( preko hibernate ) i to : 
+        JEDAN !!!
+        @SQLDelete(sql = izraz koji ustvari radi update polja deleted na true )
+        NAPOMENA : ovo se nije pokazalo dobro u kombinaciji sa ostalim audit poljima , ne azurira korektno nista jer je cist sql 
+        pa se direkt izvrsava , zato nista ne updetuje korektno (to bi uradio jpa/hibernate)
+        RESENJE : Redovan delete maping u rest controlleru , naziv metoda softdelete , parametar id , dalje slicno kao update , nadjem po id ako postoji , a kad ga nadje set delete na true pa save. Time se sve korektno azurira (version ,4 audita), a korektno se upise izmena i u history tabele envera.
+        Anotaciju cu ipak ostaviti da bi se sprecilo zaobilazno brisanje zapisa (npr neki cascade delete i sl.), ali ocekujem da se nece koristiti. Ovo je prihvatljivo resenje jer je kolicina manuelnog posla (rucno obradjivanje delete mapinga) mala pa moze zameniti potpunu automatiku.
+        DVA !!!        
+        @Where (clause = where izraz koji se dodaje postojecim where u svakom upitu kod mene deleted=false , svi koji su obrisani imaju deleted=true pa su automatski svi upiti bez obrisanih zapisa sto i hocu)
+        VAZNO : ovo VAZI za sve upite iz repositorija koji vec postoje i derived koji se izvlace na osnovu imena metode , kao i za sve query-je imenovane (u entitetima ) ili direkt pisane uz metode repositorija na JPQL(HPQL) jeziku.
+        NE VAZI za native query pisane u cistom SQL (njih jpa/hibernate direkt izvrsava pa se mora paziti manualno).
+        NAPOMENA : Ovo je i dobro jer kad obrisemo nesto sa delete metodom repositorija (bilo kojom ima ih vise), zbog @Where anotacije nemozemo da ponovo aktiviramo pogresno obrisan zapis jer update deleted na true neradi posto "obrisanog" zapisa zapravo nema sto se tice jpa/hibernate. Onda ga povratimo cistim sql ili samo izlistamo sta je obrisano i sl.
+        Koriscenje ovog oslobadja puno manuelnog rada jer se vecina (sve sem cistog crud) odnosi na vadjenje-fetch iz baza sto se ovim radi automatski uz izostavljanje obrisanih zapisa.
+        Samo tamo gde mi trebaju i obrisani zapisi ( npr. constraint check ) moram obratiti manuelno paznju sta vadim iz baze i koristiti po potrebi cisti sql - nativ query , ako mi trebaju i obrisani.
+        Postoji i resenje sa cistim spring boot data jpa( koje se ne oslanja na gornja dva izraza specificna SAMO za hibernate ), ali to je veliki posao : vidi na  https://github.com/AnghelLeonard/Hibernate-SpringBoot/tree/master/HibernateSpringBootSoftDeletesSpringStyle . Radi se tako sto se pravi soft delete repository koji vodi racuna o soft deleted poljima , tako sto extenduje jpa repository koji ja koristim , ali overajduje sve metode tako da uzimaju u obzir obrisana polja pri svim metodama u jpa repository.
+        +
+        version polje - anotacija @Version korisna je za optimistic lock - koristi ga interno jpa/hibernate. Automatski se povecava pri svakoj promeni zapisa ( od 0 pa navise ). Uvek je koristiti. Ja cu i dodatno koristiti ovo polje pri uslovnim izmenama zapisa (kasnije o tome - etag + uslovni request ). Moze se namestiti da se neki request (update ili delete) odradi samo ako se verzija na serveru i klijentu poklope (kljucno kad vise korisnika napadne isti zapis).
+        
+Step3   Moja BaseEntity klasa ce imati gore definisanih 7 polja. Obavezno se mora oznaciti sa @MappedSuperclass , a ne sa @Entity
+
+Step4   Svaka od gore navedenih klasa extenduje ovu klasu i dodaje dalje svoje ATRIBUTE
+
+Step5   SPRING DATA ENVERS ( preko Hibernate - mora se posebno dodati u pom.xml jer nije automatski aktivirana u spring data)
+        Sluzi za pracenje entity i/ili atributa (i atributa koji su kolekcije ) istorijski. 
+        Ja sam iskonfigurisao da prati svih 7 tabela koje se i audituju (dovoljno je staviti anotaciju @Audited na entity )
+        Napomena : Mora se staviti i na BaseEntity jer neradi bez toga
+        Napomena : Ove dodatne tabele pravi enver automatski i nisam ih stavio u schema.sql
+        Napomena : U application.properties konfigurise se enver ako nesto nije default (vidi tamo)
+        Enver dodaje svaki bilo kako izmenjen zapis kao novu reviziju (sa timestamp kad je i tipom kakva je revizija izvrsena 0,1,2 su insert,update,delete tipovi ). Za te tabele takodje ima repository koji se moze extendovati sa svojim metodama vezanim za razne upite sa tim tabelama, ali to necu koristiti. Ako mi zatreba istoriju cu gledati cistim sql u repozitorijumu osnovnog entiteta. 
+
+        
+

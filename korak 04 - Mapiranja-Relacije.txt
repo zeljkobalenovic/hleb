@@ -1,0 +1,50 @@
+starting point KORAK 3 Modelovanje - prosto GOTOVO
+
+Bazu po potrebi inicijalizujem sa ( schema.sql i data.sql). Sve entitete sam izmodelovao IDENTICNO sa schema.sql .
+Provera ide tako da NESME biti dodatnih ddl naredbi pri startu springa kad je ddl auto na update (OSIM ddl za envere kasnije)
+Jedini dodatak kod entiteta u modelu su name atributi u (@Table, @Column , @JoinColumn) da bi se prilagodile naming konvencije izmedju jave i mysql.
+
+MAPING RELACIJA 
+===============
+Kad se modeli entiteta(tabela) naprave samo sa atributima(kolonama) sledi mapiranje relacija.
+Bez toga u objektnom modelu podataka (java strana) nemamo vezu izmedju objekata , a kad bi takav pustili i startovali spring (bez schema.sql) tako bi napravio i bazu (tabele bi bile svaka za sebe bez ikakvih veza). Zato je modelovanje relacija OBAVEZNO.
+
+Kod mapiranja relacija u springu su bitne 4 stvari :
+VRSTA (@OneToOne , @OneToMany @ManyToOne, @ManyToMany) - sa istim znacenjem kao i u sql
+SMER (jednosmerne i dvosmerne relacije) - BITNO za oo model , nepostoji u sql
+OWNER (samo kod dvosmernih strana - odredjuje vlasnika relacije )  - postoji i u sql i oo ali je SUPROTNO znacenje
+FETCH (leazy i eager) - BITNO za oo model , nepostoji u sql.
+V R S T A
+Vrsta relacije je potpuno ista kao i u sql ( u mojoj sql semi postoje onetomany i manytomany , nemam onetoone - ali prica je slicna).Objasnjenja cu davati na primeru customer (koji ima oba tipa relacija u sql ).
+@OneToMany - @ManyToOne
+customer - customergroup ( jedna customergroup (one strana) moze imati mnogo customera (many strana))
+Relaciju u customer entitetu pravim dodavanjem polja customergroup sa obaveznom anotacijom @ManyToOne.
+ili
+Relaciju u customergroup pravim dodavanjem polja kolekcije (list,set) customera sa obaveznom anotacijom @OneToMany
+
+@ManyToMany
+customer - user ( jedan customer moze imati vise usera koji ga procesiraju i obrnuto jedan user moze brinuti o vise customera)
+Relaciju u customer entitetu pravim dodavanjem polja kolekcije usera , sa anotacijom @ManyToMany
+ili
+Relaciju u user entitetu pravim dodavanjem polja kolekcije customera , sa anotacijom @ManyToMany
+
+VAZNA NAPOMENA ( posto sam se odlucio da modeli u springu prate schemu u sql uz maping UVEK !!! dodajem i @JoinColumn sa nazivom STVARNE kolone koja povezuje tabele ). 
+Ako ovo ne uradim onda se pravi dodatna ( ili dve dodatne za manytomany ) tabela preko kojih jpa-hibernate pravi relacije.
+ZAKLJUCAK : uz svaki npr @OneToMany OBAVEZNO i @JoinColumn ( u slucaju @ManyToMany obavezno i @JoinColumn i @InverseJoinColumn) sa stvarnim kolonama iz sql u name="imestvarnejoinkolone".
+Bez ovoga ce spring praviti dodatne tabele za mapiranje relacija sto NECEMO ( hocu da schema.sql i entiteti rade isto)
+
+Za sql je dovoljno da se relacija stavi samo na JEDNU stranu ( napravice se odgovarajuca relacija u sql i bez schema.sql)
+Dodavanjem relacije i na drugi entitet NEMENJA se sql , ali se menja oo model u javi (sa prednostima i manama).
+
+Prednosti i mane razlicitih mapiranja relacija u oo modelima u dodatak 06 - JpaRelacijeBestPractice.txt
++
+Objasnenja za lombok koji automatski generise kod za entityje u dodatak 07 - Lombok.txt
+
+
+
+
+
+
+
+
+

@@ -1,38 +1,44 @@
 package baki.api.model;
 
-import java.util.List;
-
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.ResultCheckStyle;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+import org.hibernate.envers.Audited;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 
 @Entity
 @Table(name = "products")
-@Data
-public class Product {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@Audited
+@SQLDelete( sql = "UPDATE products SET deleted=true WHERE id= ?" , check = ResultCheckStyle.COUNT)
+@Where(clause = "deleted=false")
+
+public class Product extends BaseEntity {
+
     private String name;
     private String code;
     private Double price;
     private String description;
     private String picture;
-    private Boolean deleted;
-
-    @ManyToOne
+    
+    // korak 4+5 relacija sa product group jednosmerna. sve isto kao i customer - customer_group
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "products_group_id")
     private ProductGroup productGroup;
-
-    @OneToMany(mappedBy = "product")
-    private List<OrderItem> ordersitem;
 
 }

@@ -1,0 +1,69 @@
+LOMBOK
+
+    Sluzi za generisanje boilerplate koda (konstruktori,geteri,seteri,tostring,equal i hash ....)
+
+    VAZNO !!!       za jpa/hibernate uopste nije potreban (koriste field pristup). Npr repository metode rade tako.
+
+    Potreban je za manipulisanje u biznis code delu (service i/ili controller) koji ja pisem.
+    
+Za BaseEntity.java  klasu :
+    Potrebni su geteri (tj. mogu mi zatrebati u kodu koji cu pisati)
+    Potreban je seter SAMO za deleted polje. Ostala polja automatski se popunjavaju (seteri samo mogu dovesti do greske)
+    Nisu potrebni nikakvi konstruktori, tostring, equal, hash itd (klasa se NIKAD ne instancira)
+
+Za SVE klase koje nasledjuju BaseEntity  (objasnjenje za npr. CustomerGroup.java )
+    Potrebni su geteri+seteri za SVA polja ( u ovom slucaju samo name, ali druge klase imaju vise polja )
+    => @Getter + @Setter    na klasu - pa vazi za sva polja
+    Potrebni su konstruktori bez atributa i sa svim atributima ( u ovom slucaju samo name, ali druge klase imaju vise polja )
+    => @AllArgsConstructor + @NoArgsConstructor  na klasu
+    Potreban je EqualsAndHashCode 
+    => @EqualsAndHashCode(onlyExplicitlyIncluded = true , callSuper = false) na klasu
+    +
+    => @EqualsAndHashCode.Include na polja koja ucestvuju ( u ovom slucaju samo name, ali druge klase imaju vise polja )
+    Po potrebi moze i jos nesto npr. tostring ...
+
+    Objasnjenje oko @EqualsAndHashCode
+    ----------------------------------
+
+    U obicnoj javi dve objekta (dve instance iste klase ) NIKAD nisu jednaki sa default equal i hash nasledjenim iz Object.
+
+    CustomerGroup cg1 = new CustomerGroup("pera")
+    CustomerGroup cg2 = new CustomerGroup("pera")
+    boolean isti = cg1.equal(cg2)  
+    !!!  je FALSE  jer Object po defaultu equality radi kao identity ( cg1 == cg2) sto je false jer su cg1 i cg2 dve razlicite instance objekta 
+    zato se UVEK overajduje equal i hash ako hocemo smisleno da uporedimo kao gore ( da nam da true )
+
+    U sql svetu je primarni kljuc jedinstven i njegovim uporedjivanjem gledamo dali se radi o istom zapisu.
+    U oo svetu to NE MORA biti tako ( kod mene i nije )
+    Naime u oo delu ( jpa/hibernate ) objekti MOGU , ali i NE MORAJU biti jedinstveno identifikovani preko id polja.
+    RAZLOG : Ako koristimo generated type identiti (kao ja za mysql) zapis kroz svoj lifecicle u entiti menadzeru moze imati id sa vrednoscu null (pre inserta), tj. id se dobija tek po stvarnom upisu u bazu , pa pre toga dva potpuno razlicita objekta mogu davati lazni equal ako koristimo samo id ( svi id su null pa su i svi zapisi jednaki )
+    NAPOMENA : Ako je id generated type sequence id se dodeljuje odma pa se MOZE koristiti za equal.
+
+    Zato ja moram da definisem equal i hash za svaku klasu ( kad se dva zapisa smatraju jednakim )
+    Lombok tu pomaze tako sto po defaultu SVA polja ukljucuje (i u equal i u hash ) tj. da bi dva zapisa bila jednaka SVA polja moraju da se poklope. 
+    Ako ne postoji bolji nacin uvek treba ostaviti samo tu default implementaciju znaci treba klasu definisati samo sa :
+    @EqualsAndHashCode(callSuper=false)
+    To ce u equal i hash ukljuciti SVA polja klase (ali ne i ona iz parent - podeseno u zagradi)
+    Znacenje je da su dve instance klase ( dva objekta ) jednaka ako su SVA polja medjusobno jednaka
+    U slucaju customer_group to je samo name (jer su sva parent polja iskljucena), ali u opstem slucaju ima puno polja.
+    Ako u entity (tabeli baze) postoji neki atribut(kolona) koji je RAZLICIT za sve objekte(redove), a name je to u mom slucaju jer je unique , tj. u bazi NE POSTOJE dva zapisa sa istim name ( unique constraint) best practice je da se takvi atributi iskoriste za equal i hash koji je onda jednostavniji jer se zasniva na manje polja ( ovde je to isto jer ce na oba nacina napraviti equal i hash isto - jer po defaultu pravi za sva polja , a ima samo to jedno tj. name)
+    Kod entityja sa vise atributa videce se razlika. 
+    VAZNO !!! Zato kad god postoji nacin da se prostije (sa manje) polja pravi equal i hash to cu i koristiti
+    Ako imamo takve atribute (unique) treba na njih staviti i anotaciju @NaturalId (pomaze preko indexiranja jpa/hibernate za bolje performanse ) koji inace nema veze sa equal i hash 
+    ZAKLJUCAK : 
+    Na klasu se staviti @EqualsAndHashCode(onlyExplicitlyIncluded = true , callSuper = false) pa oznacavati atribute koji idu u equal i hash sa @EqualsAndHashCode.Include
+    ili
+    Na klasu staviti default @EqualsAndHashCode(callSuper = false) pa sa @EqualsAndHashCode.Exclude oznacavati atribute koji NE UCESTVUJU u equal i hash 
+
+    Ja cu prvu varijantu kad god mogu da nadjem unique - natural id (ili vise njih ako nemoze samo jedan atribut), jer je manje podlozno greskama ( nikad default , vec ja moram da odredim polja za equal i hash). Dalje preuzima lombok da napravi implementaciju ta dva metoda.
+    NAPOMENA :
+    Pre ovoga (security do koraka 2 samo user,role i permission) sam koristio @Data ( ta anotacija je zbirna i pravi sve ovo gore,ali ovako je bolje - samo ono sto mi treba pravim ). U role i permission necu nista dirati (ima viska , ali neka).
+
+    user, customer, customer_group, product, product_group, order i oreder_item cu anotirati kao sto je zakljuceno u ovom dodatku. Mislim da ce se svugde naci polje - naturalid dovoljno za prost , a delotvoran equal i hash.
+
+    
+    
+
+
+
+    

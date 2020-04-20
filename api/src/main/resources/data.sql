@@ -1,14 +1,3 @@
-/* inicijalizacija grupa products i customers */
-
-INSERT INTO products_group (name) VALUES ('PECIVO');
-INSERT INTO products_group (name) VALUES ('HLEB');
-INSERT INTO products_group (name) VALUES ('SNRZNUTI PROGRAM');
-
-INSERT INTO customers_group (name) VALUES ('STR');
-INSERT INTO customers_group (name) VALUES ('VELIKI SISTEMI');
-INSERT INTO customers_group (name) VALUES ('MALOPRODAJA');
-INSERT INTO customers_group (name) VALUES ('TENDERI');
-
 /* inicijalizacija rola */
 
 INSERT INTO roles (name) VALUES ('USER');

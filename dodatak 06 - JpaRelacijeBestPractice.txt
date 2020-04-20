@@ -1,0 +1,59 @@
+MAPIRANJE RELACIJA 
+==================
+
+Moja app sadrzi devet entiteta : user,role,permission od pre i sada dodajem customer,customergroup, product,productgroup,order i orderitem. Kad se prevede u sql ima 12 tabela (9 + 3 za veze manytomany), kao i dodatnih 7 za history (role i permission NE PRATIM). To je pocetna tacka. 
+Do sada (zakjlucno sa security) koriscena su manytomany mapiranja (user-role i role-permission) u oba slucaja jednosmerne.
+Za sve ostalo pocetna tacka je osnovno mapiranje tj. samo neophodno (znaci JEDNOSMERNO) izmedju povezanih entiteta.
+Posto meni trebaju onetomany i manytomany ( nemam onetoone ) pravim ih na sledeci nacin :
+
+user            = manytomany na customer + postojeca sa rolama
+customer        = manytomany na user ( znaci dvosmerna jer ima i tamo => ovo je za probu jer jednosmerne vec imam ) 
+                  manytoone na customergroup ( tamo nista => jednosmerna )
+customergroup   = nista ( vezana sa customer , tamo definisana )
+productgroup    = nista ( vezana sa product , tamo definisana )
+product         = manytoone sa productgroup ( tamo nista => jednosmerna )
+order           = manytoone sa customer (tamo nista =>jednosmerna )
+                  onetomany sa orderitem ( dvosmerna )  
+orderitem       = manytoone sa order ( dvosmerna )
+                  manytoone sa product ( jednosmerna , nema nista tamo )  
+
+VAZNO !!! U cilju upoznavanja rada sa relacijama DVE sam za probu stavio dvosmerne (manytomany user-customer) i (onatomany-manytoone order-orderitem), da se vidi razlika u odnosu na jednosmerne.
+
+Za sve relacije sam koristio best practice nacela mapiranja , a ona se odnose na sledece : vrsta,smer,owner i fetch kao sto je napomenuto u korak 4 mapiranje relacija.
+
+vrsta   => 
+opredeljena je po biznis modelu ( koristi se sta treba )
+
+smer    => 
+Manytomany BOLJE je jednosmerna (smer je po biznis modelu ) , ali MOZE i dvosmerna 
+probacu ovo na user-customer iako bi po biznis modelu bila jednosmerna sa strane user (tj. najcesce ce mi trebati kolekcija customera za nekog usera), a obrnuto nikad , ali da se proba.
+
+Onetomany ( Manytoone ) BOLJE je jednosmerna i to definisana sa strane (owner) koja ima pk druge strane kao svoj fk, znaci relacije se mapiraju u entitetu sa many strane. Ovo je u praksi i NAJCESCE i ima najbolje performanse (mapiranje sa druge tj. one strane bi bile kolekcije sto je problematicno zbog performansi , pa se skoro nikad ne koristi iako je moguce). U sredini izmedju ova dva je dvostrano mapiranje koje se MOZE koristiti u OPRAVDANIM situacijama. Ja sam ovo probao kod order-orderitem (to je i klasicni primer gde ima koristi od dvostranog mapiranja ).
+Use-case za ovo su situacije kada jedna strana NEMOZE da postoji bez druge ( tj. nemogu postojati stavke ordera bez ordera ), kao i kada kolekcije nisu PREVELIKE ( tj. jednom orderu pripada nekoliko stavki ).
+
+VAZNO !!! 
+Kod dvostranih mapiranja uvek treba azurirati obe strane (npr kada unesemo novi orderitem treba ga i dodati u kolekciju orderitema u entitetu order). Zato se u praksi u samom entitetu obezbedjuju pomocne metode koje to automatski rade. Npr. u order ( add orderitem i removeorderitem ) koje sluze da se orderitemi ubace/izbace iz kolekcije pa se onda zapisuje u bazu tako sinhronizovano ( vidi primer tamo )
+
+owner   =>
+Relacija se UVEK mapira sa strane koja sadrzi pk druge strane kao svoj fk ( znaci sa many strane ), a druga strana se samo pozove na taj maping ( ako je dvostrano ). Kod manytomany gde obe strane sadrze pk druge kao svoj fk bira se po biznis modelu , ili je svejedno. 
+
+fetch   =>
+UVEK se koristi fetch type LAZY , NIKAD se ne koristi fetch type EAGER 
+VAZNO (posto je default za relacije x to many lazy to je ok., ali default za sve relacije x to one je eager pa moramo rucno kod SVAKE takve relacije zahtevati Lazy).
+Fetch se odnosi na vadjenje iz baze i oznacava kako se vade povezani atributi (eager - uvek , ili lazy samo kad su potrebni ).
+
+Ovo su samo smernice , a u prakticnom radu se moze ispitati gornje.
+
+VAZNO !!! 
+Za ispitivanje efikasnosti rada sa entitetima (i relacijama medju njima) NEOPHODNO je pratiti kakve naredbe generise oo model kad se vezuje na sql model ( tj. potrebno je pracenje rada jpa/hibernate ). 
+APSOLUTNO SVE sto radi jpa/hibernate ( a i spring data jpa koji je wraper oko njega za laksi rad ), na kraju zavrsi generisanim 
+sql izrazom ( i to UVEK prepared statement - stari dobri jdbc ). 
+Posto je rad sa bazom UBEDLJIVO najsporiji deo izvrsavanja programa ( baza je cesto na drugom kraju sveta ), JAKO je VAZNO pratiti koliko i kakvih statmenta generise nasa aplikacija.
+PRACENJE se ostvaruje logovanjem sql naredbi , pracenjem sta se binduje u prepared statmente i pracenjem statistike hibernate koja nadgleda koliko jdbc se generise , koliko traju i sl.
+SVE gornje se podesava u application.properties , i koristi se dok traje dev . Posle to treba iskljuciti u production da ne opterecuje logovanje.
+
+
+
+
+            
+
