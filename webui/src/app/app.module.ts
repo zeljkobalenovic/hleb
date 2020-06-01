@@ -14,6 +14,7 @@ import { OrdersComponent } from './orders/orders.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { ReportsComponent } from './reports/reports.component';
+import { HasAnyAuthorityDirective } from './shared/auth/has-any-authority.directive';
 
 
 
@@ -27,7 +28,8 @@ import { ReportsComponent } from './reports/reports.component';
     CustomersComponent,
     ProductsComponent,
     OrdersComponent,
-    ReportsComponent
+    ReportsComponent,
+    HasAnyAuthorityDirective
     
     
     

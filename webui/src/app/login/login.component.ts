@@ -39,6 +39,7 @@ export class LoginComponent implements OnInit {
   onSubmit(){
     // promenjiva dobija pristup svim vrednostima u predmetnoj formi
     let userlogin = this.insertForm.value;
+    
     // kao parametre metoda uzimamo vrednosti dva polja forme ( iz gore kreiranog objekta)
     this.accountService.signin(userlogin.Username,userlogin.Password).subscribe(
       result=>{
@@ -55,5 +56,6 @@ export class LoginComponent implements OnInit {
   }
 
   
+
 
 }

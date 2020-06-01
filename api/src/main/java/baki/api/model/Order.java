@@ -31,8 +31,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "orders")
 
 @Audited
-@SQLDelete( sql = "UPDATE orders SET deleted=true WHERE id= ?" , check = ResultCheckStyle.COUNT)
-@Where(clause = "deleted=false")
+@SQLDelete( sql = "UPDATE orders SET deleted=true WHERE id= ? AND version= ?" , check = ResultCheckStyle.COUNT)
+@Where(clause = "deleted=0")
 
 public class Order extends BaseEntity {
     
@@ -50,5 +50,5 @@ public class Order extends BaseEntity {
 
     // korak 4+5 dvosmerna sa order itemima, mapirana je i tamo.
     @OneToMany(mappedBy = "order")
-    private List<OrderItem> ordersitem;
+    private List<OrderItem> orderItems;
 }

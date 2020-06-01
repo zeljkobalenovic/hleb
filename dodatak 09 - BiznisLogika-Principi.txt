@@ -1,0 +1,40 @@
+BIZNIS LOGIKA PRINCIPI
+======================
+
+Table - Entity ( model )
+------------------------ 
+menuitem1(profile)
+User                = base  + username,email,password,active,roles,customers 
+menuitem2(customer = zajedno sa customer group )
+CustomerGroup       = base  + name
+Customer            = base  + name,code,streetAndNumber,postcode,city,customerGroup,users
+menuitem3(product = zajedno sa product group)
+ProductGroup        = base  + name
+Product             = base  + name,code,price,description,picture,productGroup
+menuitem4(order = zajedno )
+Order               = base  + code,date,status,customer,orderItems
+OrderItem           = base  + order,product,quantity,price
+
+PRINCIP GLAVNI : 
+Na klijent stranu se NIKAD ne izlaze entity model domena (glavni razlozi su sigurnost i razdvajanje odgovornosti radi laksih izmena - ovo je bitno kad razliciti timovi pisu api i klijenta). Zato se prave dto modeli i oni ISKLJUCIVO idu i dolaze sa klijent strane. Dto modela moze biti proizvoljno mnogo (najmanje jedan za sve potrebe). U servisima se vrsi konverzija entity-dto i kontra po potrebi. Moze rucno , beanutils (ja cu tako), model mapper , mapstruct i sl.
+SVE VALIDACIJE takodje ce ici na dto modele (logicki u kontrolerima , a biznis validacija u servisima)
+Jedan dto model po domenu (za sve, input + output) je moguc , ali bolje performanse se dobijaju ciljanim dto po nameni.
+
+KORISTICU VISE DTO MODELA i to :
+input   1 dto po domenu (u folderu dto/domaindto) za create+update (sa poljima dostupnim korisniku)
+output  vise raznih dto po potrebama , a obavezno :
+        1 dto po domenu (u folderu dto/domainprojection ) za detail prikaz na klijentu
+        1 dto po domenu (u folderu dto/domainprojection ) za list prikaz na klijentu
+        + po potrebi drugih prikaza
+OVAKO se dobijaju najbolje performanse jer se UVEK upotrebljava SAMO NEOPHODNO. Lakse bi bilo sa samo jednim, sa svim zivim atributima pa posle izdvajati sta treba (bilo u servisu , ili na klijentu ), ali time bi se vise opteretila baza (a to je usko grlo jer je rad sa db UBEDLJIVO najsporiji deo).
+INPUT DTO ce biti klasicni (sa full seterima i geterima - mora tako zbog konverzije json-dto NEOPHODNI su seteri)
+OUTPUT DTO ce biti spring data projekcije (samo interfejsi) ili dtoprojekcije (klase samo sa geterima)
+
+CUSTOMER :
+input   requestbody (create + update)   CustomerDto    (name,code,streetAndNumber,postcode,city + customerGroupId)
+output  responsebody (create,update,findonedetail) CustomerDetail (id,code,streetAndNumber,postcode,city,customerGroup)
+
+
+
+
+

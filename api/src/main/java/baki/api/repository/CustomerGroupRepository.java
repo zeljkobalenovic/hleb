@@ -1,27 +1,23 @@
 package baki.api.repository;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import baki.api.dto.CgView1;
+import baki.api.dto.domainprojection.CustomerGroupNameOnly;
 import baki.api.model.CustomerGroup;
 
 @Repository
 public interface CustomerGroupRepository extends JpaRepository<CustomerGroup, Long> {
 
-    @Query(value = "SELECT * FROM customers_group WHERE deleted=true AND id= ?", nativeQuery = true)
-    Optional<CustomerGroup> findByIdDeleted(Long id);
+    Boolean existsByName(String name);
 
-    @Query(value = "SELECT * FROM customers_group", nativeQuery = true)
-    List<CustomerGroup> findAllWithDeleted();
+    // povrat za findall uvek ce biti listprojekcija domena ( ovde je izuzetan slucaj pa je nisam pravio posebno )
+    // razlog je sto ima samo jedno polje-name , za koje vec imam projekciju (za druge domene pravim list projekcije )
+    // VAZNO !!! ako hocu da mi metoda vrati projekciju mora find****By()  
+    List<CustomerGroupNameOnly> findListBy();
 
-    @Query(value = "SELECT id,name,version,deleted,last_modified_by,last_modified_date FROM customers_group_history WHERE id= ?", nativeQuery = true)
-    List<CgView1> findByIdHistory(Long id);
 
-   
 
 }

@@ -34,8 +34,8 @@ import lombok.NoArgsConstructor;
 @Audited
 
 // Samo kod usera je upitno dali koristiti softdelete ili samo active
-@SQLDelete( sql = "UPDATE users SET deleted=true WHERE id= ?" , check = ResultCheckStyle.COUNT)
-@Where(clause = "deleted=false")
+@SQLDelete( sql = "UPDATE users SET deleted=true WHERE id= ? AND version= ?" , check = ResultCheckStyle.COUNT)
+@Where(clause = "deleted=0")
 
 /*
 VAZNO ! Sve ovo vazi ako se baza pravi iz koda , ako baza vec postoji ovo ne vazi

@@ -29,8 +29,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "customers")
 
 @Audited
-@SQLDelete( sql = "UPDATE customers SET deleted=true WHERE id= ?" , check = ResultCheckStyle.COUNT)
-@Where(clause = "deleted=false")
+@SQLDelete( sql = "UPDATE customers SET deleted=id WHERE id= ? AND version= ?" , check = ResultCheckStyle.COUNT)
+@Where(clause = "deleted=0")
 
 
 public class Customer extends BaseEntity {

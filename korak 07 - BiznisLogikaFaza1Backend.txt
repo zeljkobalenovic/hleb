@@ -1,0 +1,42 @@
+BIZNIS LOGIKA 
+=============
+
+Obuhvata biznis pravila za moju aplikaciju. Radicu po fazama. 
+FAZA1 = Pocetna funkcionalnost aplikacije :
+
+ROLE + PERMISSION   =   ostaviti kako je sada hardkodovano
+-----------------------------------------------------------
+USER   
+unos novog ostaje ( sadasnja registracija )
+brisanje ( nece biti te funkcionalnosti )  
+SADA : prikazano ime logovanog usera + logout button
+FAZA1 : padajuci meni sa stavkama (vidljivo inicijalno pre otvaranja menija username logovanog korisnika + strelica za otvaranje)
+    stavka1 : MyProfile     = otvara detail view usera (username,email,status) omoguciti izmenu ( SAMO email )
+                              izmena username NIJE DOZVOLJENA
+                              izmena statusa NIJE DOZVOLJENA ( aktivaciju ili deaktivaciju radi admin + update rola)  
+    stavka2 : MyCustomers   = NAPOMENA : vidljivo samo za rolu USER ( namenjeno korisnicima van kompanije )
+                              otvara se list view customera (za logovanog usera)
+                              add new ( dodaje dozvolu za customera logovanom useru - ako zna code usera )  
+                              remove  ( brise dozvolu za customera iz liste userovih customera )  
+                              NAPOMENA : user NEMA ROLU za CRUD sa customerima (samo dobija dozvolu da pravi ordere za njih )
+    stavka3 : PasswordChange= za promenu passworda ( unos starog + 2x novi password = update passworda )
+    stavka4 : logout        = sadasnja funkcionalnost
+------------------------------------------------------------------------------------------------------------------------------
+CUSTOMER + CUSTOMER GROUP ( jedna stavka u meniju - sadasnja )
+FAZA1: otvara se list view customera ( u zavisnosti od role logovanog - za usera-njegovi , za ostale svi )
+        prikaz : name,code,streetandnumber,postcode,city + name customer grupe kojoj pripada + dugmad (v/u/d) 
+                 + 2xbutton addCustomer + addGroup ( sve ili samo dozvoljeno u zavisnosti od rola )  
+        v/u/d/c ( view detail, update, delete, create) se otvaraju iz gornjeg
+        create : klasika - sva polja (group da bude padajuca lista sa biranjem - mora se smestiti u neku grupu )
+        delete : softdelete - uslov je da NEMA ordera (+ obrisati iz dozvola usera ako je customer tamo)
+        update : sva polja se mogu promeniti 
+        
+------------------------------------------------------------------------------------------------------------------------------
+PRODUCT + PRODUCT GROUP ( jedna stavka u meniju - sadasnja )
+FAZA1:  skoro sve isto kao i kod customera ( uslov za brisanje da ga NEMA u orderitems)
+        NAPOMENA : ovde posvetiti paznju radu sa slikama i pdf ( upload ) , cuvanje u bazi njihovih url itd.
+------------------------------------------------------------------------------------------------------------------------------
+SVE OSTALO U SLEDECIM FAZAMA !!!
+        
+        
+

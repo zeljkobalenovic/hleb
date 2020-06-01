@@ -30,22 +30,30 @@ Step2   Zajednicko za sve ove klase je zasada samo id atribut ( primarni kljuc )
         Audit koristi metode @PrePersist i @Preupdate i @PreRemove da popuni polja , a ako jos nesto treba mogu i manuelno da definisem sta te dve metode da rade (nisam koristio jer je automatika ok , ali moze npr. logovanje i sl.).
         NAPOMENA : Ovaj sistem je manjkav pri brisanju jer sta god @PreRemove uradi biva obrisano zajedno sa zapisom.
         VAZNO !!! Koristicu soft delete pa mi gornje ogranicenje nije problem (inace je soft delete praksa u ozbiljnim db)
-        +
-        deleted polje (po defaultu je false). Sluzi za soft delete zapisa. Nista se stvarno nebrise iz baze nego se samo oznaci da je obrisano. Ovo zahteva da se pazi pri radu sa bazom na to polje (zapis koji je oznacen kao obrisan u stvari nije i potrebno je voditi racuna o tome pri svakom upitu u bazu ). Tu na scenu stupa opet spring data sa dve anotacije ( preko hibernate ) i to : 
+        +   
+        SOFT DELETE - JEDNOSTAVNO (ALI RADI SAMO UZ HIBERNATE)
+        deleted polje (po defaultu je 0). Sluzi za soft delete zapisa. Nista se stvarno nebrise iz baze nego se samo oznaci da je obrisano. Ovo zahteva da se pazi pri radu sa bazom na to polje (zapis koji je oznacen kao obrisan u stvari nije i potrebno je voditi racuna o tome pri svakom upitu u bazu ). Tu na scenu stupa opet spring data sa dve anotacije ( preko hibernate ) i to : 
         JEDAN !!!
-        @SQLDelete(sql = izraz koji ustvari radi update polja deleted na true )
-        NAPOMENA : ovo se nije pokazalo dobro u kombinaciji sa ostalim audit poljima , ne azurira korektno nista jer je cist sql 
-        pa se direkt izvrsava , zato nista ne updetuje korektno (to bi uradio jpa/hibernate)
-        RESENJE : Redovan delete maping u rest controlleru , naziv metoda softdelete , parametar id , dalje slicno kao update , nadjem po id ako postoji , a kad ga nadje set delete na true pa save. Time se sve korektno azurira (version ,4 audita), a korektno se upise izmena i u history tabele envera.
+        @SQLDelete(sql = izraz koji ustvari radi update polja deleted na id tog zapisa)
+        NAPOMENA : ovo se nije pokazalo dobro u kombinaciji sa ostalim audit poljima , ne azurira korektno nista jer je cist sql pa se direkt izvrsava , zato nista ne updetuje korektno (to bi uradio jpa/hibernate)
+        RESENJE : Redovan delete maping u rest controlleru , naziv metoda delete , parametar id , dalje slicno kao update , nadjem po id ako postoji , a kad ga nadje set delete na id pa save. Time se sve korektno azurira (version ,4 audita), a korektno se upise izmena i u history tabele envera.
         Anotaciju cu ipak ostaviti da bi se sprecilo zaobilazno brisanje zapisa (npr neki cascade delete i sl.), ali ocekujem da se nece koristiti. Ovo je prihvatljivo resenje jer je kolicina manuelnog posla (rucno obradjivanje delete mapinga) mala pa moze zameniti potpunu automatiku.
         DVA !!!        
-        @Where (clause = where izraz koji se dodaje postojecim where u svakom upitu kod mene deleted=false , svi koji su obrisani imaju deleted=true pa su automatski svi upiti bez obrisanih zapisa sto i hocu)
+        @Where (clause = where izraz koji se dodaje postojecim where u svakom upitu kod mene deleted=0 , svi koji su obrisani imaju deleted>0 pa su automatski svi upiti bez obrisanih zapisa sto i hocu)
         VAZNO : ovo VAZI za sve upite iz repositorija koji vec postoje i derived koji se izvlace na osnovu imena metode , kao i za sve query-je imenovane (u entitetima ) ili direkt pisane uz metode repositorija na JPQL(HPQL) jeziku.
         NE VAZI za native query pisane u cistom SQL (njih jpa/hibernate direkt izvrsava pa se mora paziti manualno).
         NAPOMENA : Ovo je i dobro jer kad obrisemo nesto sa delete metodom repositorija (bilo kojom ima ih vise), zbog @Where anotacije nemozemo da ponovo aktiviramo pogresno obrisan zapis jer update deleted na true neradi posto "obrisanog" zapisa zapravo nema sto se tice jpa/hibernate. Onda ga povratimo cistim sql ili samo izlistamo sta je obrisano i sl.
         Koriscenje ovog oslobadja puno manuelnog rada jer se vecina (sve sem cistog crud) odnosi na vadjenje-fetch iz baza sto se ovim radi automatski uz izostavljanje obrisanih zapisa.
-        Samo tamo gde mi trebaju i obrisani zapisi ( npr. constraint check ) moram obratiti manuelno paznju sta vadim iz baze i koristiti po potrebi cisti sql - nativ query , ako mi trebaju i obrisani.
-        Postoji i resenje sa cistim spring boot data jpa( koje se ne oslanja na gornja dva izraza specificna SAMO za hibernate ), ali to je veliki posao : vidi na  https://github.com/AnghelLeonard/Hibernate-SpringBoot/tree/master/HibernateSpringBootSoftDeletesSpringStyle . Radi se tako sto se pravi soft delete repository koji vodi racuna o soft deleted poljima , tako sto extenduje jpa repository koji ja koristim , ali overajduje sve metode tako da uzimaju u obzir obrisana polja pri svim metodama u jpa repository.
+        NAPOMENA : Soft delete + unique constraint polja 
+        Da bi se podrzao soft delete NEOPHODNO je postojece unique constrainte prosiriti i na deleted polje. 
+        To je NEOPHODNO da bi se postovala biznis logika - objasnicu na primeru customera (name je unique)
+        Unesemo customera name Pekabeta -> izbrisemo ga ( soft-ostaje u db) -> neki sledeci hoce name Pekabeta (nemoze ako je unique samo name , a moze ako je unique name+deleted ). Biram ovo drugo resenje (ima mana , ali je prirodnije ).
+        Nebi bilo u redu da klijentu javljam da customer sa tim imenom vec postoji , a da on kad izlista customere ne nadje nikog sa tim imenom. Mana ovog resenja bi bili upiti na cistom sql (native query ) koji obuhvataju i obrisane zapise (npr neki upit o prodanim kolicinama po customeru gde bi onda trebalo jako paziti ).
+        NAPOMENA : deleted polje NEMOZE obicno (0/1 ili true/false) jer sta ako se i druga Pekabeta obrise , kako uneti trecu ?
+        Resenje sa deleted=id je ok ( posto je id primarni key uvek je jedinstven)
+        RESENJE ZA SOFT DELETE - KOMPLIKOVANO ( ALI RADI I BEZ JPA/HIBERNATE) 
+        Postoji i resenje sa cistim spring boot data jpa( koje se ne oslanja na gornja dva izraza specificna SAMO za hibernate ), ali to je veliki posao .
+        vidi na  https://github.com/AnghelLeonard/Hibernate-SpringBoot/tree/master/HibernateSpringBootSoftDeletesSpringStyle . Radi se tako sto se pravi soft delete repository koji vodi racuna o soft deleted poljima , tako sto extenduje jpa repository koji ja koristim , ali overajduje sve metode tako da uzimaju u obzir obrisana polja pri svim metodama u jpa repository.
         +
         version polje - anotacija @Version korisna je za optimistic lock - koristi ga interno jpa/hibernate. Automatski se povecava pri svakoj promeni zapisa ( od 0 pa navise ). Uvek je koristiti. Ja cu i dodatno koristiti ovo polje pri uslovnim izmenama zapisa (kasnije o tome - etag + uslovni request ). Moze se namestiti da se neki request (update ili delete) odradi samo ako se verzija na serveru i klijentu poklope (kljucno kad vise korisnika napadne isti zapis).
         

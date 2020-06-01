@@ -22,8 +22,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "products_group")
 
 @Audited
-@SQLDelete( sql = "UPDATE products_group SET deleted=true WHERE id= ?" , check = ResultCheckStyle.COUNT)
-@Where(clause = "deleted=false")
+@SQLDelete( sql = "UPDATE products_group SET deleted=true WHERE id= ? AND version= ?" , check = ResultCheckStyle.COUNT)
+@Where(clause = "deleted=0")
 
 public class ProductGroup extends BaseEntity {
 

@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import baki.api.dto.SignInReqDto;
-import baki.api.dto.SignUpReqDto;
+import baki.api.dto.auth.SignInReqDto;
+import baki.api.dto.auth.SignUpReqDto;
 import baki.api.exception.ApiError;
 import baki.api.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
- public class AuthController {
+public class AuthController {
 
     private final AuthService authService;
     
@@ -55,7 +55,7 @@ import lombok.RequiredArgsConstructor;
 
     @PostMapping("/signin") 
     public ResponseEntity<?> signIn(@RequestBody @Valid SignInReqDto signinuser ){
-        return authService.signin(signinuser);
+            return authService.signin(signinuser);
 
     }
 

@@ -1,4 +1,4 @@
-package baki.api.dto;
+package baki.api.dto.auth;
 
 import java.util.Set;
 

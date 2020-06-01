@@ -1,5 +1,7 @@
 package baki.api.exception;
 
+import javax.validation.ConstraintViolationException;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,6 +51,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         ApiError apiError = new ApiError(e);
         HttpStatus status = apiError.getStatus();
         return new ResponseEntity<>(apiError, status);        
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    protected ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException e, WebRequest request) {
+        ApiError apiError = new ApiError(e);
+        HttpStatus status = apiError.getStatus();
+        return new ResponseEntity<>(apiError, status);                                      
     }
 
     // Primer hendlanja nulpointer greske - posto je specificnija od throwable kad se greska desi hendlace je ovako

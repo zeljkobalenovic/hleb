@@ -25,8 +25,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "orders_items")
 
 @Audited
-@SQLDelete( sql = "UPDATE orders_items SET deleted=true WHERE id= ?" , check = ResultCheckStyle.COUNT)
-@Where(clause = "deleted=false")
+@SQLDelete( sql = "UPDATE orders_items SET deleted=true WHERE id= ? AND version= ?" , check = ResultCheckStyle.COUNT)
+@Where(clause = "deleted=0")
 public class OrderItem extends BaseEntity {
     
     private Double quantity;

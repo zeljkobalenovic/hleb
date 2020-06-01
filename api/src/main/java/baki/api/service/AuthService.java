@@ -16,9 +16,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import baki.api.dto.SignInReqDto;
-import baki.api.dto.SignInResDto;
-import baki.api.dto.SignUpReqDto;
+import baki.api.dto.auth.SignInReqDto;
+import baki.api.dto.auth.SignInResDto;
+import baki.api.dto.auth.SignUpReqDto;
 import baki.api.exception.ApiError;
 import baki.api.model.Role;
 import baki.api.model.RoleName;

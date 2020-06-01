@@ -39,7 +39,7 @@ public class BaseEntity {
     private Integer version;
 
     @Setter 
-    private Boolean deleted = false;    // VAZNO !!! - polje je uvek false dok ga seter explicitno ne promeni     
+    private Long deleted = 0L;    // VAZNO !!! - polje je uvek 0 dok ga seter explicitno ne promeni     
 
     @CreatedBy
     @Column(name = "created_by")

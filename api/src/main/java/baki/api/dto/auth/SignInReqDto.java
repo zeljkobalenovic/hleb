@@ -1,4 +1,4 @@
-package baki.api.dto;
+package baki.api.dto.auth;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;

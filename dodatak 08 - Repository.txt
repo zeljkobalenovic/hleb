@@ -1,4 +1,145 @@
-REPOSITORY
+starting point :
+Izmodelovani svi entiteti + relacije i sve objasnjeno.
+Brisem CustomerGroupController.java i CustomerGroupDAO.java , kao i CgView1.java. Sve je to sluzilo za probe.
+Pravim MainController.java u kome cu isprobavati rad sa svim repository (za sve entityje). u njemu cu po biznis potrebama isprobavati sve repository , sa svim opcijama koje mogu zatrebati ( posle ga obrisati ). Pri probanju izostavicu sve validacije kao i obavezu da se razdvoje kontroler i servisi za svaki entitet.
+Takodje pravim repository za SVE entitete i SVI extenduju JpaRepository. 
+Ovde cu izneti principe rada sa repository i njegove opcije i mogucnosti, a konkretne implementacije videti u njihovom kodu.
+
+REPOSITORY 
 ==========
+DEFINICIJA !!!
+The goal of the Spring Data repository abstraction is to significantly reduce the amount of boilerplate code required to implement data access layers for various persistence stores.
+NAPOMENA:Spring data postoji i za druge tipove data store (jpa je za sql). Postoji i za nosql (npr, spring data mongo) i drugi.
+
+Centralni interfejs za spring data repository abstraction je Repository. Odredjuje SAMO tip i id domena sa koji se radi i NEMA nijednu definisanu metodu. Ako zelimo sami da pravimo nas repository od nule krenuli bi od njega.
+public interface MyRepository<T,ID> extends Repository<T,ID> { unutra definisemo metode - u startu prazan }
+Onda za konkretni domen (npr.User):
+MyUserRepository extends MyRepository<User,Long> { metode gore definisane su automatski tu }
+Sve metode su raspolozive (NEMORAJU SE NI DEKLARISATI), a dodavati i nove ili overajdovati postojece. Sve sto nudi spring data vazi ( generisanje query iz imena metode itd.)
+Ovako se moze napraviti repositort (ili vise njih) sa SAMO onim metodama koje hocu. Retko se krece od ovoga.
+
+Sledeci interfejs je CRUD koji ima definisane osnovne metode za crud operacije :
+public interface CrudRepository<T,ID> extends Repository<T,ID> { u startu vec ima definisane metode za crud } 
+Ako zelimo da ga koristimo opet mozemo genericki (za sve domene) :
+public interface MyRepository<T,ID> extends CrudRepository<T,ID> { pa dodajemo metode koje hocemo ili overajdujemo postojece}
+Onda za konkretni domen (npr.Customer):
+MyCustomerRepository extends MyRepository<User,Long> { metode gore definisane su automatski tu }
+
+Sledeci interfejs je PagingAndSortingRepository koji na crud dodaje metode za rad sa page i sort. Prica je ista kao gore.
+
+Na kraju je interfejs koji sve gornje prosiruje metodama vezanim za konkretni persistance datastore. Ima ih vise ( za jpa, za mongo ...). Posto ja koristim spring data jpa intefejs je JpaRepository. Za koriscenje je ista prica kao gore.
+public interface MyRepository<T,ID> extends JpaRepository<T,ID> { sve metode iz svih prethodnih su odma raspolozive }
+Onda za konkretni domen (npr.Order):
+MyOrderRepository extends MyRepository<User,Long> { metode gore definisane su automatski tu } 
+VAZNO !!! Gornje je moja pocetna tacka za sve repositorije (entitete). 
+NAPOMENA : intermedialni repository (genericki koji se ne implemntiraju nije potrebna njihova stvarna instanca ) se oznacavaju sa @NoRepositoryBean , a oni koji se koriste direktno (tj. njihova instanca) se anotiraju sa @Repository. To su spring anotacije i sluze da bi spring znao sta stvarno da napravi , a sta ne.
+
+QUERY METHODS :
+===============
+Ako nam trebaju metodi koji nisu vec nasledjeni ( u mom slucaju iz JpaRepository ) dodajem ih na sledeca dva nacina :
+1   DERIVING QUERY ( from method name ) - ovo je spring data jpa mogucnost ( nema u klasicnom jpa/hibernate )
+    Ako se ime metode da postujuci odredjena pravila NIJE POTREBNO VISE NISTA (automatski ce se napraviti potreban query za tu metodu ), i metoda se moze koristiti samo njenim navodjenjem u interfejsu.
+    PRIMER : List<User> findByEmailAndActive(String email,Boolean active) 
+    Za ovakav nacin rada imena metoda se MORAJU davati postujuci striktna pravila najslicnija obicnom engleskom jeziku. Ovo sve ima milion varijacija sta sme, sta ne i kako se koristi pa cu usavrsavati po potrebi.Za pomoc ima referenca dole :
+    https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#repository-query-keywords
+    https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#repositories.query-methods.query-creation
+    VAZNO !!! Ova metoda ce svakako napraviti query kao dole na kraju (prednost je sto radi automatski)
+
+2   MANUALY DEFINED QUERY - ovo ima i u klasicnom jpa/hibernate - sluzi za sve komplikovano sto nemoze gornjim nacinom
+    Query moze biti pisan u JPQL ( objektni nacin ) ili u SQL ( nativ tipa u cistom sql )
+    Query moze biti imenovan u entity klasi @NamedQuery ( ime , izraz) pa se moze koristiti za vise metoda ili se moze definisati u repository uz metodu @Query(izraz) kad vazi samo za tu metodu.
+
+VAZNO !!! Sta ce se od gornja dva koristiti definisano je strategijom (default je : CREATE_IF_NOT_FIND), sto znaci da ce implementacija metode prvo probati da nadje query (2 opcija), a ako ga nenadje pokusace da napravi iz imena metode.
+Znaci da smo imali query ( named u klasi sa name = user.findByEmailAndActive) ne bi se koristio deriving query kao gore.
+Ako koristimo ovo postoje pravila kako se moraju davati imena query i imena metoda da bi radilo.
+
+PARAMETRI ( metoda -> queryja)
+Posto u oba nacina NAKRAJU dobijemo query, parametri se prosledjuju na dva nacina :
+default = po mestu(recimo u gornjem primeru email je 1, a active je dva i moraju tim redosledom i biti navedeni pri pozivu metode)
+ili po imenu (zahteva anotaciju @Param koja povezuje naziv parametra u metodi i u queryju)
+Oba sam probao i ok rade, moze se birati.
+
+SPECIJALNI PARAMETRI : paging i sorting , oba koristim pa videti u repositorijima 
+
+@Modifying je OBAVEZNA ANOTACIJA ako query metode menja podatke (sve osim read-select). Obavezan u oba query create nacina.
+
+ENTITI GRAFOVI ( jpa - korisna mogucnost )
+Koristi se slicno kao @Query ( @EntityGraph ) u repositoriju za jednu metodu ili named varijante u entiti klasi za vise metoda
+Koristio sam , videti u repositorijima . Zgodno je i puno olaksava ,ali nesme se preterivati zbog performansi (2-3 nivoa najvise)
+
+PROJEKCIJE ( jako korisno - spring data mogucnost )
+===================================================
+Postoji i u cistom jpa/hibernate , ali tamo se moraju manuelno pisati mapiranja resultseta.
+Sve gore opisane metode vracaju JEDAN OBJEKAT (domena ciji je repo) ili KOLEKCIJU istih. Svi moguci tipovi povratnih vrednosti su:  https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#repository-query-return-types
+
+Projekcije se odnose na mapiranje rezultata metode (povratne vrednosti) u nesto drugo nego domen T (BILO JEDAN ILI KOLEKCIJU).
+Projekcija je parcijalan ( delimican ) pogled na domen ( koji obuhvata samo zeljene ATRIBUTE domena).
+Npr : moj domen-model Customer ima mnogo atributa ( name, code, city, customergroup ...). U repositoriju tog domena tj. CustomerRepository SVAKI metod moze da vrati PROJEKCIJU domena sa samo nekim atributima. Kao povratnu vrednost metode onda stavljamo projekciju ili kolekciju istih , umesto domena ili kolekcije domena.
+List<Customer> findByCity (String city)  - vraca listu customera za neki grad sa SVIM atributima
+List<MojaProjekcija> findByCity(String city) - vraca listu customera samo sa odabranim atributima ( npr name i code)
+Projekcija se pravi definisanjem interfejsa ( za gornji primer bi bilo ) :
+interface MojaProjekcija {
+    String getName();
+    String getCode();
+}
+to je sve rezultat sad umesto celog customera ( sa 15-tak atributa ) vraca samo imena i kodove (name i code)
+NEOPHODNO je striktno pridrzavanje kod imenovanja cime spring data pronalazi i mapira samo POTREBNE atribute.
+Moguce su i projekcije u vise nivoa npr. (customer + customer group) :
+interface MojCustomer {
+  String getName();
+  CustomerGroup getCustomerGroup();
+
+  interface MojCustomerGroup {
+    String getName();
+  }
+}
+Gornji primer se NAJCESCE koristi i zove se CLOSED PROJECTION. Spring data efikasno optimizuje queryje za te projekcije, kao i mapiranja rezultata jer postoji direktna veza atributa u projekciji i atributa u domenu repoa.
+
+postoje i OPEN PROJECTION gde se atributi projekcije NE MAPIRAJU direktno iz atributa dmena vec se koriste neki izrazi, Definicija takvih je npr (opet na primeru customer domena). 
+interface PunaAdresa {
+
+  @Value("#{target.streetandnumber + ' ' + target.city}")
+  String getPonaAdresa();
+}
+Kad se ovaj interfejs upotrebi kao tip rezultata metode vracale bi se pune adrese customera. @Value oznacava da se izraz racuna kao novi atribut tipa string koji se racuna iz originalnih atributa domena (street + city). Ovakve projekcije treba koristiti manje jer za iole komplikovanije izraze padaju performanse ( znaci samo za jednostavna mapiranja).
+
+Treca vrsta su CLASS BASED PROJECTION ( sto je isto kao obican DTO ). 
+To sam vec koristio , znaci klasa sa atributima, konstruktorom i geterima.
+VAZNO !!! 
+Lombok anotacija @Value pravi sv potrebno za DTO (samo definisem polja - sve ostalo konstruktor,geteri,equal,hashcode automatski)
+Primer class based projekcije ( odnosno dto ) sa lombokom za npr customer :
+@Value
+class MojCustomer {
+    String name , city ;
+}
+ZAKLJUCAK : JAKO KORISNO - koristiti projekcije sto vise ( dosad sam samo dto ), ovo je ODLICNA mogucnost.
+            VAZNO !!! Upotrebljivost projekcija je samo za read-select nad bazom.
+            Za write-insert,update MORAJU domen-entity objekti
+
+VAZNO !!! Probati i sledece mogucnost spring-data-jpa
+dinamicke projekcije , upotrebu stored procedura ( kao izvora podataka umesto queryja ), criteria query, query by example ...
+Sve to se koristi i olaksava rad , ali se redje koristi zbog komplikovanosti (bar meni je tako iako sam probao sve)
+
+TRANSAKCIJE 
+===========
+Best practice je kad se koristi na nivou repositorija @Transactional(readOnly=true) tj. svi metodi tako , a oni koji stvarno modifikuju bazu ( svi sa @Modifying anotacijom ) da se anotiraju sa @Transactional . Oni koriste onda default koji je false.
+U servisima se takodje metode koje zahtevaju transakcije tako oznacavaju (ceo servis sa readonly), a metode po potrbi.
+
+Ovo je sazetak upotrebe spring data jpa - repository. Opsirnije u dokumentaciji :
+https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#reference
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
