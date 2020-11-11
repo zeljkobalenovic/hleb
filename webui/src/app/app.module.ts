@@ -8,13 +8,14 @@ import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { HomeComponent } from './home/home.component';
-import { CustomersComponent } from './customers/customers.component';
-import { ProductsComponent } from './products/products.component';
-import { OrdersComponent } from './orders/orders.component';
+import { CustomersComponent } from './entities/customers/customers.component';
+import { ProductsComponent } from './entities/products/products.component';
+import { OrdersComponent } from './entities/orders/orders.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ModalModule } from 'ngx-bootstrap/modal';
-import { ReportsComponent } from './reports/reports.component';
+import { ReportsComponent } from './entities/reports/reports.component';
 import { HasAnyAuthorityDirective } from './shared/auth/has-any-authority.directive';
+import { CustomerGroupContainerComponent } from './features/customerGroup/customer-group-container.component';
 
 
 
@@ -29,7 +30,9 @@ import { HasAnyAuthorityDirective } from './shared/auth/has-any-authority.direct
     ProductsComponent,
     OrdersComponent,
     ReportsComponent,
-    HasAnyAuthorityDirective
+    HasAnyAuthorityDirective,
+    CustomerGroupContainerComponent,
+    
     
     
     

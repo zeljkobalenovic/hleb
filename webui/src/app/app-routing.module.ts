@@ -3,16 +3,18 @@ import { Routes, RouterModule } from '@angular/router';
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
-import { CustomersComponent } from './customers/customers.component';
-import { ProductsComponent } from './products/products.component';
-import { OrdersComponent } from './orders/orders.component';
-import { ReportsComponent } from './reports/reports.component';
+import { CustomersComponent } from './entities/customers/customers.component';
+import { ProductsComponent } from './entities/products/products.component';
+import { OrdersComponent } from './entities/orders/orders.component';
+import { ReportsComponent } from './entities/reports/reports.component';
+import { CustomerGroupContainerComponent } from './features/customerGroup/customer-group-container.component';
 
 const routes: Routes = [
   {path:'home' , component: HomeComponent},
   {path:'login' , component: LoginComponent},
   {path:'register' , component: RegisterComponent},
-  {path:'customers' , component: CustomersComponent},
+ // {path:'customers' , component: CustomersComponent},
+  {path:'customers' , component: CustomerGroupContainerComponent},
   {path:'products' , component: ProductsComponent},
   {path:'orders' , component: OrdersComponent},
   {path:'reports' , component: ReportsComponent},

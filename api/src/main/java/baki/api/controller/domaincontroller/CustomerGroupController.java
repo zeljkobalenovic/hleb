@@ -31,7 +31,7 @@ public class CustomerGroupController {
     // CUSTOMER GROUP
     // security : dozvoljeno samo zaposlenima u zavisnosti od read/write prava (role user NEMA NIKAKAV PRISTUP customergroup )
 
-    @PreAuthorize("hasAuthority('CUSTOMER_WRITE')")
+    //@PreAuthorize("hasAuthority('CUSTOMER_WRITE')")
     @PostMapping
     public ResponseEntity<?> createCustomerGroup(@Valid @RequestBody CustomerGroupDto customerGroupDto) {
         return customerGroupService.createCustomerGroup(customerGroupDto);
@@ -52,7 +52,7 @@ public class CustomerGroupController {
     }
 
     // posto roleuser ima permission customer-read (moramo dodatni uslov da zabranimo roleuser ).
-    @PreAuthorize("hasAuthority('CUSTOMER_READ') and !hasRole('ROLE_USER')")
+    // @PreAuthorize("hasAuthority('CUSTOMER_READ') and !hasRole('ROLE_USER')")
     @GetMapping
     public ResponseEntity<?> getAllCustomerGroup() {
         return customerGroupService.getAllCustomerGroup();
