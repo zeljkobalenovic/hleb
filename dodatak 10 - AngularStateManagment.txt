@@ -1,0 +1,39 @@
+STATE MANAGMENT U ANGULARU
+--------------------------
+
+Dosad sam koristio resenje tipa observable service( auth.service ) sa 3 stanja ( isloged, username, userauthority ) koja se dalje koriste u app ( npr u komponenti navbar , ili u direktivi hasanyauthority ).
+To je ok za pocetak , ali kad se nagomila puno servisa i komponenti i svega ostalog bice tesko snalazenje.
+Komplikacije mogu biti manje (vise komponenti koje komuniciraju sa jednim servisom) ili vece ( vise komponenti komunicira sa vise servisa ). Zato state managment. 
+Standarno resenje je ngRx ( redux za angular) ali je komplikovan za ucenje i ima puno koda za jednostavne app
+
+Zato sam se odlucio za neko srednje resenje tj. Observable Store. Isprobao sam dva resenja :
+https://github.com/DanWahlin/Observable-Store  i  https://github.com/georgebyte/rxjs-observable-store 
+Na kraju sam se odlucio za prvu varijantu DanWahlin ( ima vise preuzimanja i meni je razumljivija )
+
+Opsirnije : https://blog.codewithdan.com/simplifying-front-end-state-management-with-observable-store/ 
+            https://www.youtube.com/watch?v=jn4AH5pGWhA&t=600s 
+
+Na https://github.com/DanWahlin/Observable-Store postoje i lepi primeri koriscenja istog. Koraci su :
+
+1 instalisao sam paket ( klasika sa npm )
+
+2 napravi se interfejs StoreState.ts - definise SVA stanja-state koja hocemo u app (naziv i tip). Moze biti bilo gde ali postujuci ostale principe stavljam ga u shered modul ( da bude dostupan svim ostalim modulima - ovo je za ubuduce , zasad je svejedno ). Ovo je prosto pa videti u fajlu.
+
+3 proba je sa customer group i customer ( posle refaktor auth , pa ostali features )
+pravim observable store ( najobicniji angular servis ) za svaki features ( customer group i customer ). Ovo radim u rootu svakog feature foldera ( planiram i sledece korake - vise modula, lazy ucitavanje modula ... pa je ovo bitno)
+npr. observable store za auth nece ici u feature jer je auth bitan celoj app pa ide u core ili shared.
+Takodje planiram da spojim ta dva featuresa u jedan ( samo customer ) jer je customer group jako prost.
+
+4 u root foldera feature ( customer group ) pravim CustomerGroupService (sto je ustvari customer group store).
+  Svaki service-store OBAVEZNO extenduje ObservableStore<StoreState>. Observable Store cuva SVA stanja koja sam ja definisao u koraku 2 , a svaki service-store brine o delu globalnog store ( ovaj ce zasad brinuti samo o jednom stanju - CustomerGroups tipa niz customer group).
+  VAZNO :
+  -------
+  SAMO ovaj servis ce brinuti o stanju customerGroups ( putem metoda koje mogu da menjaju stanje) 
+  OSTALI (komponente i sl. ) ce MOCI da menjaju stanje SAMO pozivom metoda ovog service-store koje ce on hendlati i na kraju uraditi setState()
+  OVO ( i sva ostala stanja ) ce biti dostupna SVIMA koji ih trebaju i to :
+  JEDNOKRATNO - pozivom metode storea getState()
+  STALNO - prijavom za pracenje promene celog globalnog store ili samo nekog stanja-state 
+  Ovo je objasnjeno u komponenti customer group container ( princip podele na smart - dumb component )
+
+5 Ovako idu i svi ostali service-store 
+

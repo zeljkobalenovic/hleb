@@ -6,10 +6,19 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+// VAZNO !!! ako hocu da mi se automatski vraca dto kao tip u repository MORA konstruktor full sa svim poljima
+// MORA BITI SAMO JEDAN KONSTRUKTOR 
+// @NoArgsConstructor   ovo baca gresku jer spring data nezna koji konstruktor pa javi da nemoze konvertovati
+// rezultat tipa Customer u CustomerDto
+// Moze peske tj. ostavimo da metoda repoa vrati Customer , pa ga sa beanutil prabacimo u CustomerDto i saljemo
+@AllArgsConstructor
 public class CustomerDto {
+
+    Long id;
 
     @NotBlank
     @Size(min = 6,max = 50)

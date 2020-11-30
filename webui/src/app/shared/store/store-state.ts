@@ -8,11 +8,19 @@ export interface StoreState {
     // --------- CUSTOMER GROUP --------------
 
     customerGroups : CustomerGroup[];
+    customerGroupsQueryOptions : QueryOptions;
+    selectedCustomerGroup : CustomerGroup;
+    activeTab : string;
 
     // ------------ CUSTOMER -----------------
 
     customers : Customer[];
+    selectedCustomer : Customer;
 
+}
 
-
+export interface QueryOptions {
+    filter : string;
+    currentPage : number;
+    pageSize : number;
 }

@@ -1,0 +1,23 @@
+ANGULAR BEST PRCTICE
+--------------------
+
+Moja app nije zamisljena kao velika app , ali nadalje zelim da postuje SVE principe kao da ce biti big app
+
+npr : state managment ( za male app nije bitan nogu obicni servisi - moj auth je primer - hendla 3 stanja ), ali za vece app treba pravi state managment ...
+
+Ovo zahteva kompletan refaktor frontenda pa cu ga raditi u fazama :
+
+To cu raditi tako da nove features ( zasada customer group + customer ) dodam postujuci angular bp , a zatim dosadasnje refaktorisem da se u to takodje uklopi cime se stvara kostur za dalje sirenje app na sledece features (product,order,report ...). 
+
+Posle citanja dosta o temi svi uglavnom postuju nesto kao sto je ovo , pa cu tako i ja raditi :
+
+https://georgebyte.com/scalable-angular-app-architecture/  ovako uglavnom i drugi preporucuju pa redom :
+
+1. state managment : sve o tome dodatak 10 - AngularStateManagment.txt
+2. smart-dumb component : sve o tome dodatak 11 - SmartDumbComponent.txt
+
+
+
+
+
+

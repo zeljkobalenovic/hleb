@@ -15,7 +15,13 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { ReportsComponent } from './entities/reports/reports.component';
 import { HasAnyAuthorityDirective } from './shared/auth/has-any-authority.directive';
-import { CustomerGroupContainerComponent } from './features/customerGroup/customer-group-container.component';
+import { CustomerContainerComponent } from './features/customer/customer-container.component';
+import { CustomerGroupListComponent } from './features/customer/customer-group-list/customer-group-list.component';
+import { CustomerGroupEditComponent } from './features/customer/customer-group-edit/customer-group-edit.component';
+import { CustomerEditComponent } from './features/customer/customer-edit/customer-edit.component';
+import { CustomerListComponent } from './features/customer/customer-list/customer-list.component';
+import { CustomerGroupQueryComponent } from './features/customer/customer-group-query/customer-group-query.component';
+
 
 
 
@@ -31,7 +37,13 @@ import { CustomerGroupContainerComponent } from './features/customerGroup/custom
     OrdersComponent,
     ReportsComponent,
     HasAnyAuthorityDirective,
-    CustomerGroupContainerComponent,
+    CustomerContainerComponent,
+    CustomerGroupListComponent,
+    CustomerGroupEditComponent,
+    CustomerEditComponent,
+    CustomerListComponent,
+    CustomerGroupQueryComponent,
+    
     
     
     

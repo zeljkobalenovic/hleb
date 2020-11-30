@@ -39,7 +39,8 @@ public class CustomerGroupService {
 		}
 		CustomerGroup customerGroup = new CustomerGroup();
 		BeanUtils.copyProperties(customerGroupDto, customerGroup);
-		customerGroupRepository.save(customerGroup);		
+		CustomerGroup savedCustomerGroup = customerGroupRepository.save(customerGroup);	
+		customerGroupDto.setId(savedCustomerGroup.getId());	
 		return new ResponseEntity<>(customerGroupDto , HttpStatus.CREATED);
 	}
 
@@ -97,21 +98,30 @@ public class CustomerGroupService {
 	}
 
 	public ResponseEntity<?> getAllCustomerGroup() {
-		return new ResponseEntity<>(customerGroupRepository.findListBy(), HttpStatus.OK);
+		return new ResponseEntity<>(customerGroupRepository.findAllBy(), HttpStatus.OK);
+		
+	}
+
+	public ResponseEntity<?> queryCustomerGroup(String searchstring) {
+		return new ResponseEntity<>(customerGroupRepository.findByNameContaining(searchstring), HttpStatus.OK);
 	}
 
 	public ResponseEntity<?> getCustomerGroup(Long id) {		
-		Optional<CustomerGroup> customerGroupOptional = customerGroupRepository.findById(id);
+	//	Optional<CustomerGroup> customerGroupOptional = customerGroupRepository.findById(id);
+		Optional<CustomerGroupDto> customerGroupOptional = customerGroupRepository.findOneById(id);
 		
 		if(customerGroupOptional.isPresent()) {
-			CustomerGroupDto customerGroupDto = new CustomerGroupDto();
-			BeanUtils.copyProperties(customerGroupOptional.get(), customerGroupDto);
-			return new ResponseEntity<>(customerGroupDto, HttpStatus.OK);
+		//	CustomerGroupDto customerGroupDto = new CustomerGroupDto(null,null);
+		//	BeanUtils.copyProperties(customerGroupOptional.get(), customerGroupDto);
+			return new ResponseEntity<>(customerGroupOptional.get(), HttpStatus.OK);
 		} else {
 			String message = "Trazena grupa : " + id + " nije pronadjena.";
 			ApiError apiError = new ApiError(HttpStatus.NOT_FOUND, message);
 			return new ResponseEntity<>(apiError, apiError.getStatus());
 		}	
+		
 	}
+
+	
 
 }

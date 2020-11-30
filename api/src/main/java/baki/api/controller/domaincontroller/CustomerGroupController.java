@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import baki.api.dto.domaindto.CustomerGroupDto;
@@ -38,14 +39,14 @@ public class CustomerGroupController {
     }
 
     
-    @PreAuthorize("hasAuthority('CUSTOMER_WRITE')")
+    //@PreAuthorize("hasAuthority('CUSTOMER_WRITE')")
     @PutMapping("{id}")
     public ResponseEntity<?> updateCustomerGroup(@Valid @RequestBody CustomerGroupDto customerGroupDto,
                                                  @PathVariable @Positive Long id) {                              
         return customerGroupService.updateCustomerGroup(customerGroupDto,id);
     }
 
-    @PreAuthorize("hasAuthority('CUSTOMER_WRITE')")
+    //@PreAuthorize("hasAuthority('CUSTOMER_WRITE')")
     @DeleteMapping("{id}")
     public ResponseEntity<?> deleteCustomerGroup(@PathVariable @Positive Long id) {
         return customerGroupService.deleteCustomerGroup(id);
@@ -58,8 +59,15 @@ public class CustomerGroupController {
         return customerGroupService.getAllCustomerGroup();
     }
 
+    @GetMapping("/query")
+    public ResponseEntity<?> queryCustomerGroup(@RequestParam ("prm1") String searchstring) {
+        System.out.println("????????????????????????????");
+        System.out.println(searchstring);
+        return customerGroupService.queryCustomerGroup(searchstring);
+    }
+
     // posto roleuser ima permission customer-read (moramo dodatni uslov da zabranimo roleuser ).
-    @PreAuthorize("hasAuthority('CUSTOMER_READ') and !hasRole('ROLE_USER')")
+   // @PreAuthorize("hasAuthority('CUSTOMER_READ') and !hasRole('ROLE_USER')")
     @GetMapping("{id}")
     public ResponseEntity<?> getCustomerGroup(@PathVariable @Positive Long id) {
         return customerGroupService.getCustomerGroup(id);

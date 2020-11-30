@@ -1,0 +1,41 @@
+  <div class="container" id="tabs" #tabs>
+
+    <h6>{{ title }}</h6>
+    <br>
+
+    <ul class="nav nav-tabs">
+      <li class="nav-item">
+        <a class="nav-link active" href="#customer" [ngClass]="{ 'active':(activeTab$ |async)==='customer'}" (click)="setActiveTab('customer')"
+           data-toggle="tab">Customer</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#customergroup" [ngClass]="{ 'active':(activeTab$ |async)==='customergroup'}" data-toggle="tab"
+           (click)="setActiveTab('customergroup')">Customer Group</a>
+      </li>
+    </ul>
+  
+    <div class="tab-content">
+      
+      <div class="tab-pane" id="customer" [ngClass]="{ 'active':(activeTab$ |async)==='customer'}">
+        <div class="row">
+            <div class="col-md-4" *ngIf="customers$ | async as customers">
+              <app-customer-list [customers]="customers" (changed)="selectCustomer($event)"></app-customer-list>
+            </div>
+            <div class="col-md-8" *ngIf="selectedCustomer$ | async as selectedCustomer">
+              <app-customer-edit [selectedCustomer]="selectedCustomer"></app-customer-edit>                         
+            </div>
+        </div>        
+      </div>
+
+      <div class="tab-pane" id="customergroup" [ngClass]="{ 'active':(activeTab$ |async)==='customergroup'}">
+        <div *ngIf="customerGroupsQueryOptions$|async as customerGroupsQueryOptions">
+          <app-customer-group-query (changed)="changeQueryOptions($event)" [customerGroupsQueryOptions]="customerGroupsQueryOptions"></app-customer-group-query>
+        </div>
+        <div *ngIf="customerGroups$|async as customerGroups">
+          <app-customer-group-list [customerGroups]="customerGroups"></app-customer-group-list>          
+        </div>
+      </div>
+    </div>
+  
+  </div>
+

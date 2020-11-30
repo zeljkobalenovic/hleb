@@ -1,0 +1,7 @@
+<div class="row">
+    <div class="col-md-3">Filter by:
+        <input type="text"
+               [ngModel]="customerGroupsQueryOptions.filter"
+               (ngModelChange)="doFilter($event)" >
+    </div>
+</div>

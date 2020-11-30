@@ -128,8 +128,9 @@ public class CustomerService {
 		
 	}
 
-	public ResponseEntity<?> getAllCustomer() {
-		return null;
+	// ovo za probu frontenda 
+	public ResponseEntity<?> getAllCustomer() {		
+		return new ResponseEntity<>(customerRepository.findAllBy() , HttpStatus.OK);
 	}
 
 	public ResponseEntity<?> getCustomer(Long id) {
