@@ -167,6 +167,7 @@ export class RegisterComponent implements OnInit {
         // kad sve prodje ok ide automatski na login     
         this.router.navigate(['/login']);
       }, 
+      
       error=>{
         // ako rezultat nije ok stize nam json sa greskama 
         this.invalidRegister=true;
@@ -187,6 +188,7 @@ export class RegisterComponent implements OnInit {
         this.modalRef = this.modalService.show(this.modal);      
         // console.log(error);   // za proveru (!!! kad se zavrsi ukljuci ponovo klijent validatore)        
       }
+      
     );       
   }
 }

@@ -40,7 +40,7 @@ export class CustomerService extends ObservableStore<StoreState> {
             this.setState({customers} , 'CUSTOMERS_RELOADED');
             return customers;
           }) ,
-          // handle error
+          
         );
   }
 
@@ -52,7 +52,7 @@ export class CustomerService extends ObservableStore<StoreState> {
     else {
       return this.fetchCustomers()
         .pipe(
-          // error handler
+       
         )
       
     }
@@ -67,7 +67,7 @@ export class CustomerService extends ObservableStore<StoreState> {
           this.setState( {selectedCustomer} , 'CUSTOMER_SELECTED');
           return selectedCustomer;
         }) ,
-        // handle error
+        
       );
   }
 
@@ -83,7 +83,7 @@ export class CustomerService extends ObservableStore<StoreState> {
         switchMap( customer => {
           return this.fetchCustomers();
         }),
-        // handle error
+        
       );
   }
 

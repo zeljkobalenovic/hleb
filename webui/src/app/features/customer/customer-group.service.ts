@@ -17,7 +17,7 @@ export class CustomerGroupService extends ObservableStore<StoreState> {
 
   constructor( private http : HttpClient ) {
     super( { trackStateHistory : true , logStateChanges : true } );  
-    // dok traje dev , posle je super( {} ) bice po defaultu tj. false
+    // dok traje dev , posle samo super( {} ) bice po defaultu tj. false
   }
 
   // metode(klasicno) -- actions(state-managment)
@@ -55,7 +55,7 @@ export class CustomerGroupService extends ObservableStore<StoreState> {
             this.setState( { customerGroups } , 'GET_CUSTOMER_GROUPS' );
             return customerGroups;
           }),
-          // catchError(this.handleError)
+          
         );
   }
 
@@ -69,7 +69,7 @@ export class CustomerGroupService extends ObservableStore<StoreState> {
     else {
       return this.fetchCustomerGroups()        
         .pipe(
-          catchError(this.handleError)
+          
         );
     }
   }
@@ -123,13 +123,6 @@ export class CustomerGroupService extends ObservableStore<StoreState> {
       ).subscribe();
   }
 
-  private handleError(error: any) {
-    console.error('server error:', error);
-    if (error.error instanceof Error) {
-        const errMessage = error.error.message;
-        return Observable.throw(errMessage);
-    }
-    return Observable.throw(error || 'Server error');
-  }
+  
 
 }

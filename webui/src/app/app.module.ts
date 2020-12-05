@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
+import { ErrorHandler, NgModule } from '@angular/core';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -21,6 +21,9 @@ import { CustomerGroupEditComponent } from './features/customer/customer-group-e
 import { CustomerEditComponent } from './features/customer/customer-edit/customer-edit.component';
 import { CustomerListComponent } from './features/customer/customer-list/customer-list.component';
 import { CustomerGroupQueryComponent } from './features/customer/customer-group-query/customer-group-query.component';
+import { GlobalErrorHandler } from './core/error/globalErrorHandler';
+import { BackendErrorInterceptor } from './core/interceptors/backendErrorInterceptor';
+import { ModalNotificationComponent } from './shared/components/modal-notification.component';
 
 
 
@@ -43,9 +46,7 @@ import { CustomerGroupQueryComponent } from './features/customer/customer-group-
     CustomerEditComponent,
     CustomerListComponent,
     CustomerGroupQueryComponent,
-    
-    
-    
+    ModalNotificationComponent,  
     
     
   ],
@@ -58,7 +59,13 @@ import { CustomerGroupQueryComponent } from './features/customer/customer-group-
     // mora ovako tj. mora biti dostupno SVIMA !!! (znaci u root) jer iskace nezavisno od komponenti i mora se tako hendlati 
     ModalModule.forRoot()
   ],
-  providers: [],
+  entryComponents: [
+    ModalNotificationComponent
+  ],
+  providers: [
+    {provide:ErrorHandler,useClass:GlobalErrorHandler},
+    {provide:HTTP_INTERCEPTORS,useClass:BackendErrorInterceptor,multi:true}
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

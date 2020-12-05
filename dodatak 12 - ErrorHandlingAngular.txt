@@ -1,0 +1,46 @@
+ANGULAR ERROR HANDLING
+--------------------------
+
+Isto kao i kod jave error handling u angularu (typescript-javascript) zasniva se na reakciji na gresku. Ako se greska desi a mi je ne hendlamo izvrsavanje programa - scripta se PREKIDA.
+
+Osnovno hendlanje greski je sa try - catch kao i kod jave. Ako se u try delu desi greska izvrsava se catch koji tu gresku hendla (npr ispise u konzoli i sl.), sto omogucava da se program dalje izvrsava. 
+
+Kao i u spring boot i u angularu je error handling centralno uredjen i po defaultu ispisuje greske u konzoli. 
+
+Osnovna radnja u error handlingu je da ga prilagodimo nasim potrebama, sto se radi implementacijom angularovog Error Handler interfejsa , sa jedinom metodom handleError(error) u kojoj reagujemo na gresku na nacin kako zelimo ( npr. razlicite reakcije na razlicite greske, izvrsavanje koda ako je backend greska , obavestavanje korisnika o greski putem notifikacije ili modal prozora, logovanje greski za kasnije ...).
+
+Posto je error handling vazan u celoj aplikaciji stavljam ga u core folder (a posle refaktora u core modul). Sve dalje pogledati u core/error/globalErrorHandler.ts
+Vazna napomena : mora se i registrovati u app modulu kao provider.
+
+SVAKI ERROR treba da se u hendleru : obradi (error service), loguje (log service) , obavesti korisnik ( notification service) , .... 
+
+Error moze biti klijentski (klasican javascript error sa message(sta se desilo opis) + stack (sta je uzrokovalo problem - koji script,koja linija...)) i serverski (backend) onda je HttpErrorResponse objekat (koji takodje ima message, stack i sl.). Posto sam u springboot vec napravio handler za greske u slucaju backend greske reagujem na tip greske (u zavisnosti od status koda u responsu) i na samu gresku koja je u body responsa (nema stacka jer ga server ne salje , ima u body message , sub message , timestamp ...).
+
+Napravio sam jedinstveni model greske myError sa message (klijent+server), subErrors(server), stack(klijent). Ovo zadnje je samo tokom dev , u prod obavezno izbaciti i korisniku prikazivati samo message
+
+Error service ima samo dve metode koje ce error hendler pozivati po potrebi kada hendla gresku da bi je dobio u obliku zgodnom za user notification , logovanje ...
+
+Napomena 1: 
+Backed error interceptor radi , ali je pitanje da li u svim slucajevima treba retry, npr. pri registraciji novog
+korisnika (ako odaberem ime koje vec postoji) server vraca bad request gde to objasnjava , pa je pitanje da li treba
+tri puta ponoviti request (mislim da bi retry trebalo raditi samo u slucaju statusa 500+ npr. serer timeout i sl.)
+Ako server vrati gresku 400+ onda i objasnjava klijentu sta ne valja , pa nema potrebe ponavljati request.
+Posto HttpErrorResponse sadrzi i status mogao bi jedan if vece od 500 pa onda retry , a za 400+ odma da baci error
+Zasad ostavljam uvek retry pa cu videti. Ovaj interceptor je za errore , ali bice i drugih - opis u sledecem dodatku
+Napomena 2:
+Sada login i registracija vec sami hendlaju gresku tako da se global error handling ne koristi nego lokalno napisan
+Cim se iskljuci hendlanje greske lokalno proradi globalni kako treba, zato cu posle uraditi refaktor svega oko user
+managmenta ( state managment - observable store , error handling izbaciti - samo globalno , podela na module ...).
+
+Logging service je takodje NEOPHODAN za dobre app. Error service ce uhvatiti gresku , pozvati notification service 
+da obavesti korisnika , ali mi MORAMO imati logging service koji ce PROGRAMERA obavestiti o greski , sacuvati je i omoguciti da istu ispravimo (program treba da predupredi sto vise gresaka).
+Posto se greske desavaju na racunaru korisnika , kome nemamo pristup logging se radi drugacije nego na serveru. nema
+cuvanja u fajl-bazu i sl. i posle gledanja. Ja cu napraviti logging servis da samo posalje gresku na konzolu , ali
+u prod eksploataciji za logging se koristi neki od gotovih servisa (obicno se nesto placaju) npr. Bugsnag, Sentry, Rollbar, Slack , TrackJs ... Ovo cu u logging servisu samo oznaciti kao pravi nacin bez implementacije (da se ne registrujem ). Svi ovi servisi obavestavaju programera o greski uz sve potrebne podatke za njenu ispravku.
+Pogledati logging servis
+
+Notification service sluzi da se korisnik obavesti o greski. Realizovao sam ga tako sto pravim modal koji ce pri erroru iskociti i obavestiti korisnika. Za razliku od dosadasnjeg modala u npr. registraciji ili obicnog obavestenja u login , sad pravim UNIVERZALNO resenje tj. JEDAN modal (u shared folderu-modulu) kao zasebnu komponentu , a ne kao ng-templete u svakoj pojedinacnoj komponenti koja zahteva prikaz modala. Koristice ga moj notification service da pokaze klijentsku gresku i/ili serversku gresku umesto da svaka komponenta radi to zasebno (npr. sadasnja registration prikazuje i error i success na svoj nacin sto cu refaktorisati). Koristicu ngx bootstrap kao i do sada (mogu i razne druge biblioteke).
+
+Sve zajedno je u core/error , osim error interceptora koji je medju interceptorima u core/interceptors
+
+Global error handler objedinjuje sve gore napisano ( koristeci servise )
