@@ -18,4 +18,8 @@ Kod hendlanja errora sam vec napravio prvi interceptor:
 2.   auth interceptor (pravim):
     request - treba da pokupi jwt token iz localstorage i ubaci ga u auth heder originalnog requesta i posalje
               novi tako izmenjen (kloniran)
+              takodje sam implementirao refresh jwt , ako je istekao (ako je jwt istekao uradice refresh pa onda poslati
+              request , a da korisnik to ni neprimeti - zasada hardkodovano - treba uraditi refresh token back+front metode)
     response - ne hendla 
+
+    

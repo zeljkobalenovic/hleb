@@ -3,7 +3,7 @@ import { HttpErrorResponse, HttpEvent, HttpHandler, HttpHeaders, HttpInterceptor
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { EMPTY, Observable } from 'rxjs';
-import { catchError, delay, tap } from 'rxjs/operators';
+import { catchError, delay, map, switchMap, tap } from 'rxjs/operators';
 import { AccountService } from 'src/app/services/account.service';
 import { NotificationService } from '../error/services/notification.service';
 
@@ -24,13 +24,29 @@ export class AuthInterceptor implements HttpInterceptor {
         // Ako jwt token postoji i nije istekao salje req sa dodatim auth headerom
         if ( localStorage.getItem('jwt') && (new Date()<new Date(+localStorage.getItem('expiration')*1000))) {
             return next.handle(req.clone({headers: req.headers.set('Authorization', 'Bearer ' + localStorage.getItem('jwt'))}));
+        }   
+         
+        // Ako jwt token postoji ali je istekao prvo uradi refresh token pa onda isto kao malopre
+        if ( localStorage.getItem('jwt') && (new Date()>=new Date(+localStorage.getItem('expiration')*1000))) {
+
+            return this.authService.refreshToken().pipe(
+                tap( token => this.authService.setToken(token)), 
+                map( token => this.attachToken(req , token)),
+                switchMap(req => next.handle(req))
+            );
+            
         }         
 
-        // Ako jwt ne postoji ili je istekao radim logout + error koji ce global error hendlati i obavestiti korisnika
+        // Ako jwt ne postoji radim logout + error koji ce global error hendlati i obavestiti korisnika
         this.authService.signout();
         throw new Error("Problem sa autentikacijom (token nedostaje ili je istekao. Molimo Vas da se ponovo logujete");    
 
         
     }
+
+    // helper metoda koja ubacuje auth token u header
+    private attachToken(req: HttpRequest<any>, jwt: string): HttpRequest<any> {
+        return req.clone({ headers: req.headers.set('Authorization', 'Bearer ' + jwt)})
+      }
     
 }

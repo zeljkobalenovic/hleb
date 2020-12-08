@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject, of } from 'rxjs';
 import { map, toArray } from 'rxjs/operators'
 // VAZNO ovaki se importuje biblioteka za dekodovanje jwt - prethodno instalisana sa npm i nista vise netreba
 import * as jwt_decode from "jwt-decode";
@@ -22,6 +22,8 @@ import { StoreState } from '../shared/store/store-state';
 // sa autentikacijom i autorizacijom ( znaci metode koje pristupaju auth delu api - signup i signin), promenjive koje cuvaju
 // odredjena stanja i parametre autha i tome slicno
 export class AccountService extends ObservableStore<StoreState>{
+    
+    
 
   // posto pristupa api obavezno mi treba http servis - di u konstruktor ( ovo je jedan od gotovih servisa angulara)
   constructor(private http:HttpClient , private router:Router) {
@@ -152,6 +154,18 @@ signup(username:string,password:string,cpassword:string,email:string,cemail:stri
       return error;
     }
   ));
+}
+
+// refresh token
+refreshToken() : Observable<string>{
+  // hardkodovano za probu auth interceptora koji ako je token istekao pribavlja novi sa servera koji vazi duze
+  const jwt: string = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJiYWtpYmFraTIiLCJhdXRob3JpdGllcyI6W3siYXV0aG9yaXR5IjoiUFJPRFVDVF9XUklURSJ9LHsiYXV0aG9yaXR5IjoiUk9MRV9HRU5FUkFMTUFOQUdFUiJ9LHsiYXV0aG9yaXR5IjoiQ1VTVE9NRVJfV1JJVEUifSx7ImF1dGhvcml0eSI6IlJFUE9SVF9SRUFEIn0seyJhdXRob3JpdHkiOiJPUkRFUl9SRUFEIn0seyJhdXRob3JpdHkiOiJST0xFX01BTkFHRVIifSx7ImF1dGhvcml0eSI6IlJPTEVfQURNSU4ifSx7ImF1dGhvcml0eSI6IkNVU1RPTUVSX1JFQUQifSx7ImF1dGhvcml0eSI6Ik9SREVSX1dSSVRFIn0seyJhdXRob3JpdHkiOiJST0xFX0VNUExPWUVFIn0seyJhdXRob3JpdHkiOiJQUk9EVUNUX1JFQUQifV0sImVtYWlsIjoiYmFraWJha2kyQGdtYWlsLmNvbSIsImlhdCI6MTYwNzQzODMzOSwiZXhwIjoxNjA3NDQxOTM5fQ.IK7s_u7bdTkXcZ8X0LQp9vGApfiRVE8-JXI1b8WcyFY'
+  return of(jwt);
+}
+
+// set token
+setToken(token: string): void {
+  localStorage.setItem('jwt', token);
 }
 
 // signout - logout metoda
