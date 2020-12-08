@@ -27,7 +27,11 @@ export class ErrorService {
 
   getServerMessage(error : HttpErrorResponse) : MyError {
     // od serverske greske hocu samo message i subErrors
-    const myMessage : string = error.error.message;
+    // kod npr. http backend error interceptora greska ce uvek biti ovakva i genericka je u error.mesage
+    // nju upisujem ako nema specificne (recimo server je ugasen stici ce 504 ) i nema specificne greske
+    // ali ako je server ok i npr. req ne valja u error.error.message ce biti bolje objasnjenje pa to upisujem
+    // npr customer sa tim imenom vec postoji stize 400 bad request , a moja poruka je u error.error.message
+    const myMessage : string = (error.error.message) ? error.error.message : error.message;
     const mySubErrors : string[] = error.error.subErrors;
     // const myError : MyError = {message : myMessage , subErrors : mySubErrors }
     // Ovako slucajno moze jer prva dva parametra popunjavamo sa ove dve konstante treci stack  ce biti undefined

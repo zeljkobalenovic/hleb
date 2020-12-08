@@ -5,7 +5,10 @@ import { map, toArray } from 'rxjs/operators'
 // VAZNO ovaki se importuje biblioteka za dekodovanje jwt - prethodno instalisana sa npm i nista vise netreba
 import * as jwt_decode from "jwt-decode";
 import { Router } from '@angular/router';
-import { AsyncPipe } from '@angular/common';
+import { ObservableStore } from '@codewithdan/observable-store';
+import { StoreState } from '../shared/store/store-state';
+
+
 
 // ova anotacija zajedno sa odgovarajucim importom kazuje angularu da je ova klasa servis i da je dostupna svima 
 // (zbog providedin root). Stvar je ista kao u spring boot tj. servis se putem dependenci injectiona koristi u drugim klasama
@@ -18,10 +21,12 @@ import { AsyncPipe } from '@angular/common';
 // namena ove klase je da obezbedi komponentama angulara (raznim) potrebne informacije i metode za rad sa api koji ima veze
 // sa autentikacijom i autorizacijom ( znaci metode koje pristupaju auth delu api - signup i signin), promenjive koje cuvaju
 // odredjena stanja i parametre autha i tome slicno
-export class AccountService {
+export class AccountService extends ObservableStore<StoreState>{
 
   // posto pristupa api obavezno mi treba http servis - di u konstruktor ( ovo je jedan od gotovih servisa angulara)
-  constructor(private http:HttpClient , private router:Router) { }
+  constructor(private http:HttpClient , private router:Router) {
+    super({});
+  }
 
   // properties koji cuvaju value kojima ce pristupati korisnici servisa (komponente)
   // base url na serveru za api
@@ -152,6 +157,7 @@ signup(username:string,password:string,cpassword:string,email:string,cemail:stri
 // signout - logout metoda
 signout() {
   this.loginStatus.next(false);
+  AccountService.clearState();
   localStorage.setItem('loginStatus','0'); 
   localStorage.removeItem('jwt');  
   localStorage.removeItem('username');

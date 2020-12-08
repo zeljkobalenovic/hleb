@@ -24,8 +24,7 @@ import { CustomerGroupQueryComponent } from './features/customer/customer-group-
 import { GlobalErrorHandler } from './core/error/globalErrorHandler';
 import { BackendErrorInterceptor } from './core/interceptors/backendErrorInterceptor';
 import { ModalNotificationComponent } from './shared/components/modal-notification.component';
-
-
+import { AuthInterceptor } from './core/interceptors/authInterceptor';
 
 
 @NgModule({
@@ -64,7 +63,9 @@ import { ModalNotificationComponent } from './shared/components/modal-notificati
   ],
   providers: [
     {provide:ErrorHandler,useClass:GlobalErrorHandler},
-    {provide:HTTP_INTERCEPTORS,useClass:BackendErrorInterceptor,multi:true}
+    {provide:HTTP_INTERCEPTORS,useClass:AuthInterceptor,multi:true},
+    {provide:HTTP_INTERCEPTORS,useClass:BackendErrorInterceptor,multi:true},
+    
   ],
   bootstrap: [AppComponent]
 })

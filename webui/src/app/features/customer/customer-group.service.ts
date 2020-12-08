@@ -49,7 +49,7 @@ export class CustomerGroupService extends ObservableStore<StoreState> {
 
 
   private fetchCustomerGroups() : Observable<CustomerGroup[]> {
-      return this.http.get<CustomerGroup[]>(this.apiUrl)
+        return this.http.get<CustomerGroup[]>(this.apiUrl)
         .pipe(
           map( customerGroups => {
             this.setState( { customerGroups } , 'GET_CUSTOMER_GROUPS' );

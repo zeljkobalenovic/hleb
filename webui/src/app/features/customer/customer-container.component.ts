@@ -70,6 +70,7 @@ export class CustomerContainerComponent implements OnInit {
       )
     );
 
+    
     this.customerGroups$ = merge(
       this.customerGroupService.getAll(),      
       this.customerGroupService.stateChanged.pipe(

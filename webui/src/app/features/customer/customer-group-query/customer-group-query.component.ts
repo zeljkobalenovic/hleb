@@ -32,7 +32,6 @@ export class CustomerGroupQueryComponent implements OnInit {
   }
 
   doFilter(searchString : string) {
-    console.log("Pozvan je filter koji kontejneru prosledjuje event da je chengovan i na sta")
     this.changed.emit(searchString);
   }
 

@@ -31,13 +31,13 @@ public class CustomerController {
     // Security : dozvoljeno zaposlenima u zavisnosti od read/write prava , i roleuser samo uslovni read
     // Uslov dodati tako da svi read metodi ako je roleuser prikazuju SAMO customera/e za koje je doticni registrovan
 
-    //@PreAuthorize("hasAuthority('CUSTOMER_WRITE')")
+    @PreAuthorize("hasAuthority('CUSTOMER_WRITE')")
     @PostMapping
     public ResponseEntity<?> createCustomer(@Valid @RequestBody CustomerDto customerDto) {
         return customerService.createCustomer(customerDto);
     }
 
-    //@PreAuthorize("hasAuthority('CUSTOMER_WRITE')")
+    @PreAuthorize("hasAuthority('CUSTOMER_WRITE')")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateCustomer(@Valid @RequestBody CustomerDto customerDto,
             @PathVariable("id") @Positive Long id) {
@@ -50,7 +50,7 @@ public class CustomerController {
         return customerService.deleteCustomer(id);
     }
 
-    //@PreAuthorize("hasAuthority('CUSTOMER_READ')")
+    @PreAuthorize("hasAuthority('CUSTOMER_READ')")
     @GetMapping
     public ResponseEntity<?> getAllCustomer() {
         return customerService.getAllCustomer();

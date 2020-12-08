@@ -1,2 +1,21 @@
 ANGULAR INTERCEPTORS
---------------------------
+--------------------
+
+VAZNO : odnose se samo na HTTP komunikaciju sa serverom ( svi su HTTP_INTERCEPTORS)
+VAZNO : Ako ih ima vise aktiviraju se redosledom kako su navedeni u provajder nizu u app modulu, a kada stigne
+        response kontra. Korisno je napraviti jednu konstantu sa svima , pa je ubaciti u modul (ja sam tako).
+VAZNO : request i response su uvek NEPROMENJIVI - IMUTABLE tj. interceptori ih ne menjaju nikada, nego uvek prave
+        NOVE sa clone (vidi u auth interceptoru)
+
+Kod hendlanja errora sam vec napravio prvi interceptor:
+
+1.   backendErrorInterceptor : 
+    request - ne hendla 
+    response - ako je success ne hendla, a ako je error hendla neke greske (radi retry na 504) ili nehendla
+    (drugi statusi greske). Vraca isti error stream kao i na ulazu (ne menja originalni HttpErrorResponse)
+    Mogao je da clonira ulaznu gresku , nesto izmeni i posalje nju.
+
+2.   auth interceptor (pravim):
+    request - treba da pokupi jwt token iz localstorage i ubaci ga u auth heder originalnog requesta i posalje
+              novi tako izmenjen (kloniran)
+    response - ne hendla 
