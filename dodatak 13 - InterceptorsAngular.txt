@@ -3,23 +3,28 @@ ANGULAR INTERCEPTORS
 
 VAZNO : odnose se samo na HTTP komunikaciju sa serverom ( svi su HTTP_INTERCEPTORS)
 VAZNO : Ako ih ima vise aktiviraju se redosledom kako su navedeni u provajder nizu u app modulu, a kada stigne
-        response kontra. Korisno je napraviti jednu konstantu sa svima , pa je ubaciti u modul (ja sam tako).
+        response kontra.
 VAZNO : request i response su uvek NEPROMENJIVI - IMUTABLE tj. interceptori ih ne menjaju nikada, nego uvek prave
         NOVE sa clone (vidi u auth interceptoru)
 
 Kod hendlanja errora sam vec napravio prvi interceptor:
 
-1.   backendErrorInterceptor : 
-    request - ne hendla 
-    response - ako je success ne hendla, a ako je error hendla neke greske (radi retry na 504) ili nehendla
-    (drugi statusi greske). Vraca isti error stream kao i na ulazu (ne menja originalni HttpErrorResponse)
-    Mogao je da clonira ulaznu gresku , nesto izmeni i posalje nju.
+Napravio sam sledece interceptore i rasporedio ih sledecim redosledom :
+logging
+loader
+auth
+backendError
+VAZNO : 
+Namena i nacin rada je opisan u svakom pojedinacno.
 
-2.   auth interceptor (pravim):
-    request - treba da pokupi jwt token iz localstorage i ubaci ga u auth heder originalnog requesta i posalje
-              novi tako izmenjen (kloniran)
-              takodje sam implementirao refresh jwt , ako je istekao (ako je jwt istekao uradice refresh pa onda poslati
-              request , a da korisnik to ni neprimeti - zasada hardkodovano - treba uraditi refresh token back+front metode)
-    response - ne hendla 
+VAZNO
+Redosled je bitan pa sam malo eksperimentisao. Prvo logging , da se meri komplet trajanje http (sa aktiviranjem loadera i
+ubacivanjem tokena u header - malo povecava vreme u odnosu da je npr ovo zadnji interceptor).
+U slucaju nedostupnosti servera - status 504 ovako logging interceptor loguje u konzolu jedan neuspesni http sa ukupnim trajanjem
+Kada je ovaj interceptor proban posle backenderror interceptora , onda u tom slucaju loguje u konzoli tri neuspesna requesta
+sa kracim vremenom izvrsenja svakog requesta.
+Zato je redosled bitan (kod mene zbog zadnjeg backenderror interceptora) koji u slucaju npr. statusa 504 zadrzava ceo lanac
+dok neproba 3 puta, zato sam ga ja stavio na kraj (nije tako obavezno)
 
-    
+
+

@@ -20,4 +20,9 @@ export class LoggingService {
     this.slackService.postErrorOnSlack(error);    
   }
   */
+
+  // isto za npr loggovanje http iz logging interceptora (loguje request,rezultat i vreme trajanja 
+  logRequest(loggText: string) {
+    console.log(loggText);
+  }
 }

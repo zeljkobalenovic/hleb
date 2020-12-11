@@ -26,6 +26,7 @@ import { BackendErrorInterceptor } from './core/interceptors/backendErrorInterce
 import { ModalNotificationComponent } from './shared/components/modal-notification.component';
 import { AuthInterceptor } from './core/interceptors/authInterceptor';
 import { LoaderInterceptor } from './core/interceptors/loaderInterceptor';
+import { LoggingInterceptor } from './core/interceptors/loggingInterceptor';
 
 
 @NgModule({
@@ -64,6 +65,7 @@ import { LoaderInterceptor } from './core/interceptors/loaderInterceptor';
   ],
   providers: [
     {provide:ErrorHandler,useClass:GlobalErrorHandler},
+    {provide:HTTP_INTERCEPTORS,useClass:LoggingInterceptor,multi:true},
     {provide:HTTP_INTERCEPTORS,useClass:LoaderInterceptor,multi:true},
     {provide:HTTP_INTERCEPTORS,useClass:AuthInterceptor,multi:true},
     {provide:HTTP_INTERCEPTORS,useClass:BackendErrorInterceptor,multi:true},

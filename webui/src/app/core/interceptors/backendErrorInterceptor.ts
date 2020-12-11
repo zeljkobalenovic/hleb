@@ -43,7 +43,8 @@ export class BackendErrorInterceptor implements HttpInterceptor {
                 delay(this.dellay)
             )),                
             catchError( (error: HttpErrorResponse) => {
-                // ovde se greska prvo moze hendlati ako treba , ja jednostavno bacam i global error handler dalje radi
+                // ovde se greska prvo moze hendlati ako treba , ja jednostavno bacam i ona ide u lanac interceptora
+                // koji je dalje sprovode do kraja , pa na kraju greska ode na global error handler 
                 return throwError(error);
             })            
         );           
