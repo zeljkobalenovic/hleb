@@ -2,6 +2,14 @@
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom mb-3">
   
       <a class="navbar-brand" href="http://localhost:8080/api/home/hello">Hleb Api</a>
+
+      
+        <button *ngIf="showLoader$|async" class="btn btn-primary text-white" type="button" disabled>
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          Loading data ...
+        </button>     
+      
+
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
               aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>

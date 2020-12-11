@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { LoaderService } from '../core/error/services/loader.service';
 import { AccountService } from '../services/account.service';
 
 @Component({
@@ -9,7 +11,7 @@ import { AccountService } from '../services/account.service';
 })
 export class NavMenuComponent implements OnInit {
 
-  constructor(private accountService:AccountService) { }
+  constructor(private accountService:AccountService , private loaderService:LoaderService) { }
 
   // prikazivanje stavki u meniju u zavisnosti od logovanog korisnika 
   // sve sto je potrebno pripremio sam u account servisu , imam tri behavior subjecta i tri getera za citanje istih
@@ -18,6 +20,7 @@ export class NavMenuComponent implements OnInit {
   // ako ima logovanog usera hocu da se nevidi vise login i register , a da se vidi logout i username 
   // + da se vide dozvoljene stavke home, order, product, customer , a reports samo ako userrola dozvoljava
 
+  showLoader$: Observable<boolean>;
   LoginStatus$ : Observable<boolean>;
   UserName$ : Observable<string>;
   UserAuthority : string;
@@ -33,6 +36,18 @@ export class NavMenuComponent implements OnInit {
   
 
   ngOnInit() {
+
+    this.showLoader$=this.loaderService.stateChanged.pipe(
+      map( state => {
+        if (state && state.showLoader) {
+          return state.showLoader;
+        } 
+        else {
+          return false;
+        }
+      })
+    )
+
     this.LoginStatus$=this.accountService.isLoged();
     this.UserName$=this.accountService.getUserName();
   //  this.UserAuthority$=this.accountService.getUserAuthorities();

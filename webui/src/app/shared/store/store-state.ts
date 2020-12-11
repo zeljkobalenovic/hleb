@@ -5,6 +5,10 @@ import { CustomerGroup } from 'src/app/core/model/customerGroup';
 
 export interface StoreState {
 
+    // --------- LOADER SHOW --------------
+
+    showLoader : boolean;
+
     // --------- CUSTOMER GROUP --------------
 
     customerGroups : CustomerGroup[];

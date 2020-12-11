@@ -23,7 +23,8 @@ export class AuthInterceptor implements HttpInterceptor {
 
         // Ako jwt token postoji i nije istekao salje req sa dodatim auth headerom
         if ( localStorage.getItem('jwt') && (new Date()<new Date(+localStorage.getItem('expiration')*1000))) {
-            return next.handle(req.clone({headers: req.headers.set('Authorization', 'Bearer ' + localStorage.getItem('jwt'))}));
+            req = this.attachToken(req , localStorage.getItem('jwt'));                      
+            return next.handle(req);
         }   
          
         // Ako jwt token postoji ali je istekao prvo uradi refresh token pa onda isto kao malopre
@@ -47,6 +48,7 @@ export class AuthInterceptor implements HttpInterceptor {
     // helper metoda koja ubacuje auth token u header
     private attachToken(req: HttpRequest<any>, jwt: string): HttpRequest<any> {
         return req.clone({ headers: req.headers.set('Authorization', 'Bearer ' + jwt)})
+
       }
     
 }

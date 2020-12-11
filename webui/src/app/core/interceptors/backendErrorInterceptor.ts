@@ -32,10 +32,9 @@ export class BackendErrorInterceptor implements HttpInterceptor {
     // npr ako je server down status ce biti 504 , pa probam jos dva puta u nadi da ce server doci sebi
     
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {  
-        let attempt: number = 0;    
+        let attempt: number = 0; 
         return next.handle(req).pipe(
-            retryWhen((errors) => errors.pipe( 
-                                               
+            retryWhen((errors) => errors.pipe(                                                
                 tap(error => {
                     if (++attempt >= this.retryLimit || (error.status !== 504 && error.status !== 500)){
                         throw error;
@@ -44,19 +43,7 @@ export class BackendErrorInterceptor implements HttpInterceptor {
                 delay(this.dellay)
             )),                
             catchError( (error: HttpErrorResponse) => {
-                // ovde bi islo hendlanje klijentskih 400+ gresaka
-
-                /* recimo preusmerimo klijenta na neku stranicu pa bacimo gresku
-                if (error.status === 401 || error.status === 400 || error.status === 403) {
-                    this.router.navigateByUrl('abort-access', { replaceUrl: true });
-                }
-                return throwError(error);
-                */
-
-                // ili uopste nebacimo gresku nego je ispravimo (npr. jwt token istekao stigne greska), nemoramo 
-                // korisniku baciti gresku , nego pozovemo metodu da refresh token , pa ponovo posaljemo request
-
-                // ovako samo bacam gresku
+                // ovde se greska prvo moze hendlati ako treba , ja jednostavno bacam i global error handler dalje radi
                 return throwError(error);
             })            
         );           
