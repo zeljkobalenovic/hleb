@@ -12,7 +12,9 @@ import { CustomersComponent } from './entities/customers/customers.component';
 import { ProductsComponent } from './entities/products/products.component';
 import { OrdersComponent } from './entities/orders/orders.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ModalModule } from 'ngx-bootstrap/modal';
+import { AccordionModule } from 'ngx-bootstrap/accordion';
 import { ReportsComponent } from './entities/reports/reports.component';
 import { HasAnyAuthorityDirective } from './shared/auth/has-any-authority.directive';
 import { CustomerContainerComponent } from './features/customer/customer-container.component';
@@ -27,6 +29,7 @@ import { ModalNotificationComponent } from './shared/components/modal-notificati
 import { AuthInterceptor } from './core/interceptors/authInterceptor';
 import { LoaderInterceptor } from './core/interceptors/loaderInterceptor';
 import { LoggingInterceptor } from './core/interceptors/loggingInterceptor';
+import { CustomerQueryComponent } from './features/customer/customer-query/customer-query.component';
 
 
 @NgModule({
@@ -47,7 +50,8 @@ import { LoggingInterceptor } from './core/interceptors/loggingInterceptor';
     CustomerEditComponent,
     CustomerListComponent,
     CustomerGroupQueryComponent,
-    ModalNotificationComponent,  
+    ModalNotificationComponent,
+    CustomerQueryComponent,  
     
     
   ],
@@ -58,7 +62,9 @@ import { LoggingInterceptor } from './core/interceptors/loggingInterceptor';
     FormsModule,
     ReactiveFormsModule,
     // mora ovako tj. mora biti dostupno SVIMA !!! (znaci u root) jer iskace nezavisno od komponenti i mora se tako hendlati 
-    ModalModule.forRoot()
+    ModalModule.forRoot(),
+    AccordionModule.forRoot(),
+    BrowserAnimationsModule
   ],
   entryComponents: [
     ModalNotificationComponent

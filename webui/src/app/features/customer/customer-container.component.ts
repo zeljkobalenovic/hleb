@@ -4,7 +4,7 @@ import { combineLatest, merge, Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Customer } from 'src/app/core/model/customer';
 import { CustomerGroup } from 'src/app/core/model/customerGroup';
-import { QueryOptions } from 'src/app/shared/store/store-state';
+import { customerGroupQueryOptions, customerQueryOptions } from 'src/app/shared/store/store-state';
 import { CustomerGroupService } from '../customer/customer-group.service';
 import { CustomerService } from './customer.service';
 
@@ -25,8 +25,8 @@ export class CustomerContainerComponent implements OnInit {
 
   customerGroups$ : Observable<CustomerGroup[]>
   selectedCustomerGroup$ : Observable<CustomerGroup>;
-  customerGroupsQueryOptions$ : Observable<QueryOptions>;
-  
+  customerGroupsQueryOptions$ : Observable<customerGroupQueryOptions>;
+  customerQueryOptions$ : Observable<customerQueryOptions>;
   customers$ : Observable<Customer[]>;
   selectedCustomer$ : Observable<Customer>;
   
@@ -43,7 +43,7 @@ export class CustomerContainerComponent implements OnInit {
           return state.activeTab;
         } 
         else {
-          return 'customergroup';
+          return 'customer';
         }
       })
     )
@@ -54,6 +54,17 @@ export class CustomerContainerComponent implements OnInit {
         map( state => {
           if (state) {
             return state.customerGroupsQueryOptions;
+          }
+        })
+      )
+    )
+
+    this.customerQueryOptions$ = merge(
+      this.customerService.getQueryOptions(),
+      this.customerService.stateChanged.pipe(
+        map( state => {
+          if (state) {
+            return state.customerQueryOptions;
           }
         })
       )
@@ -101,7 +112,8 @@ export class CustomerContainerComponent implements OnInit {
       })
     );
 
-    
+    // this.customerGroupService.getAll().subscribe();
+    // this.customerService.getAll().subscribe();
 
   }  
 
@@ -109,7 +121,7 @@ export class CustomerContainerComponent implements OnInit {
     this.customerService.setActiveTab(activeTab);
   }
 
-  selectCustomer(id : string) {
+  selectCustomer(id : number) {
     this.customerService.setSelectedCustomer(id);
   }
 

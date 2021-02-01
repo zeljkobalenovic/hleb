@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { of } from 'rxjs';
-import { QueryOptions } from 'src/app/shared/store/store-state';
+import { customerGroupQueryOptions } from 'src/app/shared/store/store-state';
 
 @Component({
   selector: 'app-customer-group-query',
@@ -9,14 +9,14 @@ import { QueryOptions } from 'src/app/shared/store/store-state';
 })
 export class CustomerGroupQueryComponent implements OnInit {
 
-  private _customerGroupsQueryOptions : QueryOptions;
+  private _customerGroupsQueryOptions : customerGroupQueryOptions;
 
   @Input()
-  get customerGroupsQueryOptions() : QueryOptions {
+  get customerGroupsQueryOptions() : customerGroupQueryOptions {
     return this._customerGroupsQueryOptions;
   }
 
-  set customerGroupsQueryOptions( value : QueryOptions) {
+  set customerGroupsQueryOptions( value : customerGroupQueryOptions) {
     if (value) {
       this._customerGroupsQueryOptions=value;
     }

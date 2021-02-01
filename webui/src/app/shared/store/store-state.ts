@@ -5,26 +5,31 @@ import { CustomerGroup } from 'src/app/core/model/customerGroup';
 
 export interface StoreState {
 
-    // --------- LOADER SHOW --------------
-
+    // --------- LOADER SHOW -----------------
     showLoader : boolean;
-
-    // --------- CUSTOMER GROUP --------------
-
-    customerGroups : CustomerGroup[];
-    customerGroupsQueryOptions : QueryOptions;
-    selectedCustomerGroup : CustomerGroup;
+    // ---- CUSTOMER AND CUSTOMER GROUP ------
     activeTab : string;
 
-    // ------------ CUSTOMER -----------------
-
+    customerGroups : CustomerGroup[];
     customers : Customer[];
+    selectedCustomerGroup : CustomerGroup;
     selectedCustomer : Customer;
+    customerGroupsQueryOptions : customerGroupQueryOptions;
+    customerQueryOptions : customerQueryOptions;
+
+    // ---- PRODUCT AND PRODUCT GROUP --------  
+    
 
 }
 
-export interface QueryOptions {
+export interface customerGroupQueryOptions {
     filter : string;
+    currentPage : number;
+    pageSize : number;
+}
+
+export interface customerQueryOptions {
+    filter : string[];
     currentPage : number;
     pageSize : number;
 }

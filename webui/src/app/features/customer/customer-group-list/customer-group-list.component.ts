@@ -1,3 +1,4 @@
+import { JsonPipe } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { CustomerGroup } from 'src/app/core/model/customerGroup';

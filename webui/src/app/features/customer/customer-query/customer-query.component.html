@@ -1,0 +1,52 @@
+<div class="card">
+  <!-- <div class="card-header">
+    Naslov kartice
+  </div> -->
+  <div class="card-body">
+    <div class="form">
+      <div class="row">
+        <div class="col-md-4">
+          <input type="text" class="form-control mb-2 mr-sm-2" placeholder="Filter by name">
+        </div>
+        <div class="col-md-4">
+          <select name="cars" class="form-control mb-2 mr-sm-2 custom-select">
+            <option selected>Filter by group</option>
+            <option value="volvo">Volvo</option>
+            <option value="fiat">Fiat</option>
+            <option value="audi">Audi</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <select name="cars" class="form-control mb-2 mr-sm-2 custom-select">
+            <option selected>Sort by</option>
+            <option value="volvo">Volvo</option>
+            <option value="fiat">Fiat</option>
+            <option value="audi">Audi</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-4"> 
+          <div>
+            <button class="btn btn-primary mb-2 mr-2">Prev</button>
+            Page : 5 of 25
+            <button class="btn btn-primary mb-2 mr-2">Next</button>
+          </div>      
+        </div>
+        <div class="col-lg-4">
+          Select page size
+          <button class="btn btn-primary mb-2 mr-2"
+                *ngFor="let pageSize of pageSizes"
+                (click)="setPageSize(pageSize)"
+                [ngClass]="{'active': pageSize === selectedButton}">
+          {{ pageSize }}
+        </button>
+        </div>
+        <div class="col-lg-4">
+          Total items : 225
+        </div>
+      </div>
+    </div>
+  </div>
+
+

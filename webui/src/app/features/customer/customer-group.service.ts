@@ -4,7 +4,7 @@ import { ObservableStore } from '@codewithdan/observable-store';
 import { Observable, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { CustomerGroup } from 'src/app/core/model/customerGroup';
-import { QueryOptions, StoreState } from 'src/app/shared/store/store-state';
+import { customerGroupQueryOptions, StoreState } from 'src/app/shared/store/store-state';
 
 @Injectable({
   providedIn: 'root'
@@ -49,7 +49,7 @@ export class CustomerGroupService extends ObservableStore<StoreState> {
 
 
   private fetchCustomerGroups() : Observable<CustomerGroup[]> {
-        return this.http.get<CustomerGroup[]>(this.apiUrl)
+    return this.http.get<CustomerGroup[]>(this.apiUrl)
         .pipe(
           map( customerGroups => {
             this.setState( { customerGroups } , 'GET_CUSTOMER_GROUPS' );

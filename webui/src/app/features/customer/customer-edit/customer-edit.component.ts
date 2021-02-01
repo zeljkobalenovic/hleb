@@ -21,7 +21,8 @@ export class CustomerEditComponent implements OnInit, OnDestroy {
     return this._selectedCustomer;
   }
 
-  set selectedCustomer( value : Customer ) {
+  
+  set selectedCustomer( value : Customer) {
     if (value) {
       this._selectedCustomer=value;
       this.customerForm.patchValue(this._selectedCustomer);
@@ -35,8 +36,9 @@ export class CustomerEditComponent implements OnInit, OnDestroy {
     name : ['', [Validators.required, Validators.minLength(6), Validators.maxLength(50)]],
     code : ['', [Validators.required, Validators.minLength(6), Validators.maxLength(50)]],
     streetAndNumber : ['', [Validators.required, Validators.minLength(6), Validators.maxLength(50)]],
-    postcode : ['', [Validators.required, Validators.minLength(6), Validators.maxLength(50)]],
+    postcode : ['', [Validators.required, Validators.minLength(5), Validators.maxLength(50)]],
     city : ['', [Validators.required, Validators.minLength(6), Validators.maxLength(50)]],
+    customerGroupId : []
   });
 
   private subscription : Subscription = new Subscription();  
@@ -50,16 +52,23 @@ export class CustomerEditComponent implements OnInit, OnDestroy {
   ngOnInit() {      
        
   }
+
+  addNewCustomer() {
+    this._selectedCustomer=null;
+    
+    this.customerForm.reset();
+  }
   
 
   onSubmit() {
+    console.log("submit pozvan");
+    console.log(this.customerForm);
+    
     if ( this.customerForm.valid ) {
-      // ...spread operator customerGroup ima ista polja kao i forma ovo donje je skracena sintaksa 
-      /* umesto peske upisivanja jednog po jednog moze sve odjednom 
-      this.customerGroup.id=this.customerGroupForm.value('id');
-      this.customerGroup.name=this.customerGroupForm.value('name');
-      .... */
       const customerValue : Customer = { ...this._selectedCustomer , ...this.customerForm.value }
+      console.log(customerValue);
+      customerValue.customerGroupId=56;
+      console.log(customerValue);
       if (customerValue.id) {
         // ako id postoji update postojeceg
         this.update(customerValue);
@@ -84,7 +93,7 @@ export class CustomerEditComponent implements OnInit, OnDestroy {
   }
 
   delete() {
-    this.subscription = this.customerService.delete(this._selectedCustomer.id).subscribe( () => {
+    this.subscription = this.customerService.delete(this.selectedCustomer.id).subscribe( () => {
       this.navigateHome();
     })
   }
@@ -93,9 +102,11 @@ export class CustomerEditComponent implements OnInit, OnDestroy {
     this.router.navigate(['/customers']);
   }
 
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
-  }
+  ngOnDestroy(): void {    
+      this.subscription.unsubscribe();
+    }
+    
+  
 
 }
 

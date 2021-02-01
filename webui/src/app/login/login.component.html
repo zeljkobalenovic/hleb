@@ -14,7 +14,7 @@
         <label for="username">User Name</label>
         <input type="text" formControlName="Username" class="form-control" id="username" placeholder="Enter your username ...">
             <!-- START    Validacija za svako polje , ako je ima (ja imam po 3 validatora za svako polje) -->
-            <div *ngIf="Username.touched && Username.errors" class="errorMesage">
+            <div *ngIf="Username.touched && Username.errors" class="errorMessage">
                 <span *ngIf="Username.hasError('required')">User name is required</span>
                 <span *ngIf="Username.hasError('minlength')">User name min lenght is 6</span>
                 <span *ngIf="Username.hasError('maxlength')">User name max lenght is 50</span>
@@ -26,7 +26,7 @@
         <label for="password">Password</label>
         <input type="password" formControlName="Password" class="form-control" id="password" placeholder="Enter your password ...">
             <!-- START    Validacija za svako polje , ako je ima (ja imam po 3 validatora za svako polje) -->
-            <div *ngIf="Password.touched && Password.errors" class="errorMesage">
+            <div *ngIf="Password.touched && Password.errors" class="errorMessage">
                 <span *ngIf="Password.hasError('required')">Password is required</span>
                 <span *ngIf="Password.hasError('minlength')">Password min lenght is 6</span>
                 <span *ngIf="Password.hasError('maxlength')">Password max lenght is 50</span>

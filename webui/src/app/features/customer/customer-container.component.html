@@ -1,8 +1,5 @@
   <div class="container" id="tabs" #tabs>
 
-    <h6>{{ title }}</h6>
-    <br>
-
     <ul class="nav nav-tabs">
       <li class="nav-item">
         <a class="nav-link active" href="#customer" [ngClass]="{ 'active':(activeTab$ |async)==='customer'}" (click)="setActiveTab('customer')"
@@ -17,6 +14,11 @@
     <div class="tab-content">
       
       <div class="tab-pane" id="customer" [ngClass]="{ 'active':(activeTab$ |async)==='customer'}">
+        <div class="row">
+          <div class="col-md-12">
+            <app-customer-query></app-customer-query>
+          </div>          
+        </div>
         <div class="row">
             <div class="col-md-4" *ngIf="customers$ | async as customers">
               <app-customer-list [customers]="customers" (changed)="selectCustomer($event)"></app-customer-list>

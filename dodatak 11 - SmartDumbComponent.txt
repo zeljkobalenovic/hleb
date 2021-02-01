@@ -1,2 +1,7 @@
 SMART DUMB COMPONENT
 --------------------------
+
+Vazan princip kod dizajniranja komponenti je odredjivanje tipa gde postoje dva osnovna :
+1   smart - controler - container ( koriste se svi ti nazivi ) karakteristike ovih komponenti su :
+    glavne su u routeru , sve iz njih izvedene su u child rutama 
+    odgovorne su za prikupljanje svih podataka preko servisa iz state managmenta i/ili backenda

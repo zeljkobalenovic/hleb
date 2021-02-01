@@ -11,7 +11,7 @@ export class LoggingService {
 
   logError(error : MyError) {
     // samo za test - ovako NE RADITI - samo message upisujem na conzolu
-    console.log("Loging service : " + error.message);
+    console.log("Logging service : " + error.message);
   }
 
   /*  
@@ -23,6 +23,6 @@ export class LoggingService {
 
   // isto za npr loggovanje http iz logging interceptora (loguje request,rezultat i vreme trajanja 
   logRequest(loggText: string) {
-    console.log(loggText);
+    console.log("Logging service : " + loggText);
   }
 }
